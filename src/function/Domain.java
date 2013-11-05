@@ -29,6 +29,8 @@ public class Domain {
 	public boolean isSubsetOf(Domain d) {
 		return d.lb < lb && ub < d.ub && h >= d.h && Math.IEEEremainder(h, d.h)/d.h < VANISH_PREC;
 	}
+	
+	public static double getVanishPrec(){ return VANISH_PREC; }
 
 	@Override
 	public int hashCode() {

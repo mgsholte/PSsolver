@@ -2,7 +2,10 @@ package utils;
 
 import java.awt.Graphics;
 
-/**
+/**(EDIT 11/3/13:  This class doesn't do anything, this was just the first run at using the shooting method.
+ * Now calculatePsi is a method called within the FindNewPotential class)
+ * 
+ * 
  * This class will (eventually) take an input of a potential function and some situational parameters and calculate 
  * energies along with their associated wavefunctions
  * 

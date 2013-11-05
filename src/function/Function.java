@@ -31,13 +31,22 @@ public class Function {
 		domain = d;
 	}
 	
+	public Function(double[] fileData) {
+		vals = new double[fileData.length - 3];
+		for (int index = 3; index < fileData.length; index++)
+			vals[index] = fileData[index];
+		domain = new Domain(fileData[0], fileData[1], fileData[2]);
+	}
+
 	/// getter methods
 	public double getLB() { return domain.lb; }
 	public double getUB() { return domain.ub; }
 	public double getH()  { return domain.h; }
 	public Domain getDomain() { return domain; }
+	public double[] getVals() { return vals; }
+	public int getSize() { return vals.length; }
 
-	// /**standard string conversion
+	// /**standard string conversion - probably not necessary
 	// *
 	// */
 	// public String toString(){
@@ -64,6 +73,17 @@ public class Function {
 			sum[i] = this.vals[i] + f.vals[i];
 		}
 		return new Function(sum, domain);
+	}
+	
+	public double compare(Function f){
+		if (!domain.equals(f.domain))
+			throw new DomainMismatchException();
+		double[] f1Square = this.times(this).getVals();
+		double[] f2Square = f.times(f).getVals();
+		double diff = 0;
+		for (int index = 0; index < this.getVals().length; index++)
+			diff += f1Square[index] - f2Square[index];
+		return diff;
 	}
 
 	/**
