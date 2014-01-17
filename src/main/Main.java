@@ -2,6 +2,7 @@ package main;
 
 import solvers.ODESolver;
 import solvers.PoissonSolver;
+import solvers.SORSolver;
 import solvers.SchrodingerSolver;
 import solvers.ShootingSolver;
 import utils.ConvergenceTester;
@@ -67,7 +68,7 @@ public final class Main {
 			// update eigenvals to test for convergence
 			convTester.updateCurValues( ((SchrodingerSolver) solver).getEigenvalues() );
 			// solve poissons eqn
-			solver = new PoissonSolver(params, rho);
+			solver = new SORSolver(params, rho);
 			// implicitly scaled by electron charge, which is 1
 			electronPotential = solver.solve()[0];
 		} while (!convTester.hasConverged());

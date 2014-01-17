@@ -5,9 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
-public class WellParameters extends Parameters {
+public class WellParameters {
 	
 	public static final String defaultParamsFileName = "./well_params_default.kvp";
+
+	private Properties params;
 
 	public int numLayers;
 	
