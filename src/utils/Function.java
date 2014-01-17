@@ -41,6 +41,8 @@ public abstract class Function {
 		throw new UnsupportedOperationException("TODO: implement Function.integrate()");
 	}
 
+	//TODO: getNormalizingFactor() and normalize() methods need to be added
+	
 	abstract public Function square();
 	
 }

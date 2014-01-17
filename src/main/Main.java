@@ -61,6 +61,7 @@ public final class Main {
 			ODESolver solver = new ShootingSolver(params, totalPotential);
 			Function[] psis = solver.solve();
 			// get areal chg density
+			//TODO: take into account N_i
 			Function rho = Function.getZeroFcn(domain);
 			for(Function psi : psis) {
 				rho = psi.square().add(rho);

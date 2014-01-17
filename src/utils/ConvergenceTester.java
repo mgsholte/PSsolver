@@ -1,12 +1,11 @@
 package utils;
 
-import java.util.List;
 
 public class ConvergenceTester {
 
 	private final double targetErr;
 			
-	private Double[] oldVals, curVals;
+	private double[] oldVals, curVals;
 	
 	private double err, maxErr;
 	
@@ -19,15 +18,15 @@ public class ConvergenceTester {
 		return maxErr < targetErr;
 	}
 	
-	public void updateCurValues(List<Double> newVals) {
+	public void updateCurValues(double[] newVals) {
 		// test input
-		if (curVals != null && newVals.size() != curVals.length)
+		if (curVals != null && newVals.length != curVals.length)
 			throw new IllegalArgumentException("Can only update convergence test values with a list which is the same length as the old one");
 		// update references
 		oldVals = (curVals == null) 
-					? new Double[newVals.size()]
+					? new double[newVals.length]
 					: curVals;
-		curVals = newVals.toArray(curVals);
+		curVals = newVals;
 		// recalc error
 		maxErr = 0;
 		for (int i = 0; i < curVals.length; ++i) {

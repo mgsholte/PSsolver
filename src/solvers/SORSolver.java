@@ -6,6 +6,8 @@ import utils.GreedyFunction;
 import utils.WellParameters;
 
 public class SORSolver extends PoissonSolver {
+	
+	protected static final double ERR_TOLERANCE = 1E-6;
 
 	/** parameter controlling the successive over-relaxation mixing*/
 	private final double SORParam;
