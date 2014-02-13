@@ -35,12 +35,15 @@ public class Domain implements Iterable<Double> {
 	/** the uniform spacing between points in the domain */
 	private double dx;
 	
+	//TODO: Can we change this so that it always sets the upper bound to be the higher x value?
 	public Domain(double lb, double ub, double dx) {
 		// if lb > ub, then dx < 0 should be true
 		this.lb = lb; this.ub = ub; this.dx = dx;
 	}
 	
 	 public double getDx() { return dx; }
+	 public double getUB() { return ub; }
+	 public double getLB() { return lb; }
 
 	/**
 	 * Partition a domain into contiguous, non-overlapping sub-domains. The number of new domains

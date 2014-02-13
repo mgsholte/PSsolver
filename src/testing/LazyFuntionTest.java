@@ -9,6 +9,7 @@ import org.junit.Test;
 import utils.Domain;
 import utils.Function;
 
+
 public class LazyFuntionTest {
 
 	private Domain dom;
