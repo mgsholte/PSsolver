@@ -44,5 +44,13 @@ public abstract class Function {
 	//TODO: getNormalizingFactor() and normalize() methods need to be added
 	
 	abstract public Function square();
+
+	public double[] toArray() {
+		double[] ans = new double[domain.getNumPoints()];
+		int i = 0;
+		for (double x : domain)
+			ans[i++] = evalAt(x);
+		return ans;
+	}
 	
 }

@@ -11,7 +11,8 @@ public abstract class SchrodingerSolver extends ODESolver {
 	public static final double HBAR = 6.582E-16; // in eV*s
 	public static final double DEL_E = .005; // in eV
 	
-	private double[] eigenvalues;
+	//TODO: there is probably a better way to handle the eigenvals
+	protected double[] eigenvalues;
 	
 	public SchrodingerSolver(WellParameters params, Function potential) {
 		super(params, potential);

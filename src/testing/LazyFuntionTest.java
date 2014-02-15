@@ -1,13 +1,17 @@
 package testing;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.After;
+import java.util.Arrays;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+
 import utils.Domain;
 import utils.Function;
+import utils.LazyFunction;
 
 
 public class LazyFuntionTest {
@@ -19,17 +23,12 @@ public class LazyFuntionTest {
 		dom = new Domain(-5, 5, 0.5);
 	}
 
-	@After
-	public void tearDown() throws Exception {
-	}
-
 	@Test
 	public void testEvalAt() {
 		IdFunction id = new IdFunction(dom);
 		
 		for(double x : id.getDomain()) {
-			if (id.evalAt(x) != x)
-				fail("id(x) == x, but we had id(x) == "+id.evalAt(x)+", and x == "+x);
+			assertEquals(x, id.evalAt(x), 0.0001);
 		}
 	}
 
@@ -38,11 +37,28 @@ public class LazyFuntionTest {
 		IdFunction id = new IdFunction(dom);
 		Function twoX = id.add(id);
 		for(double x : twoX.getDomain()) {
-			if (twoX.evalAt(x) != x+x)
-				fail("2*x =="+(x+x)+", but twoX(x) =="+twoX.evalAt(x));
+			assertEquals(x+x, twoX.evalAt(x), 0.0001);
 		}
 		
 		
 	}
+	
+	@Test
+	public void testToArray() {
+		Function square = new LazyFunction(dom) {
+			@Override
+			public double evalAt(double x) {
+				return x*x;
+			}
+		};
+		double[] squares = square.toArray();
+		
+		for (int i = 0; i < 5; ++i) {
+			double x = dom.getValAtIndex(i);
+			assertEquals(x*x, squares[i], 0.0001);
+		}
+	}
+	
+	
 
 }

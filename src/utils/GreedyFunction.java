@@ -59,4 +59,9 @@ public class GreedyFunction extends Function {
 		return new GreedyFunction(domain, sqrVals);
 	}
 
+	@Override
+	public double[] toArray() {
+		return vals;
+	}
+
 }
