@@ -1,5 +1,6 @@
 package main;
 
+import solvers.FiniteDifferenceSolver;
 import solvers.ODESolver;
 import solvers.PoissonSolver;
 import solvers.SORSolver;
@@ -58,7 +59,7 @@ public final class Main {
 		do {
 			// solve schrodingers eqn
 			totalPotential = electronPotential.add(params.getBgPotential());
-			ODESolver solver = new ShootingSolver(params, totalPotential);
+			ODESolver solver = new FiniteDifferenceSolver(params, totalPotential);
 			Function[] psis = solver.solve();
 			// get areal chg density
 			//TODO: take into account N_i

@@ -12,6 +12,7 @@ public abstract class SchrodingerSolver extends ODESolver {
 	public static final double DEL_E = .005; // in eV
 	
 	//TODO: there is probably a better way to handle the eigenvals
+	//TODO: initialize when used since we don't know how many evs will be found a priori
 	protected double[] eigenvalues;
 	
 	public SchrodingerSolver(WellParameters params, Function potential) {
