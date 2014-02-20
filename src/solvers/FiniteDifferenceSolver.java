@@ -19,7 +19,7 @@ public class FiniteDifferenceSolver extends SchrodingerSolver {
 	}
 	
 	@Override
-	public Function[] solve() {
+	public Function[] solveSystem() {
 		// minimally define Hamiltonian matrix (it is symmetric and tridiagonal)
 		double[] diag = potential.toArray();
 		final int N = diag.length;
