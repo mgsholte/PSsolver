@@ -19,6 +19,16 @@ public abstract class SchrodingerSolver extends ODESolver {
 		super(params, potential);
 	}
 	
+	abstract public Function[] solveSystem();
+	
+	/**
+	 * default, do-nothing implementation
+	 */
+	@Override
+	protected Function solve(double param) {
+		return null;
+	}
+	
 	public final double[] getEigenvalues() {
 		return eigenvalues;
 	}
