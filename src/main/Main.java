@@ -5,7 +5,6 @@ import solvers.ODESolver;
 import solvers.PoissonSolver;
 import solvers.SORSolver;
 import solvers.SchrodingerSolver;
-import solvers.ShootingSolver;
 import utils.ConvergenceTester;
 import utils.Domain;
 import utils.Function;
@@ -32,9 +31,9 @@ public final class Main {
 	public static void main(String[] args) {
 		// ensure that there is at least one input file
 		//TODO should warn on extraneous args 
-		if (args.length < 2) {
+		if (args.length < 1) {
 			System.err.println("Error: must specify an input file with the well parameters. Terminating.");
-			usage(args[0]);
+			usage("PSsolver");
 			System.exit(1);
 			return;
 		}
@@ -42,10 +41,10 @@ public final class Main {
 		// read in the parameters that control the problem. Quit on failure
 		WellParameters params;
 		try {
-			params = new WellParameters(args[1]);
+			params = new WellParameters(args[0]);
 		} catch (ParameterReadException e) {
 			System.err.println(e.getMessage());
-			usage(args[0]);
+			usage("PSsolver");
 			System.exit(2);
 			return;
 		}
@@ -59,8 +58,8 @@ public final class Main {
 		do {
 			// solve schrodingers eqn
 			totalPotential = electronPotential.add(params.getBgPotential());
-			ODESolver solver = new FiniteDifferenceSolver(params, totalPotential);
-			Function[] psis = solver.solve();
+			SchrodingerSolver sSolver = new FiniteDifferenceSolver(params, totalPotential);
+			Function[] psis = sSolver.solveSystem();
 			// get areal chg density
 			//TODO: take into account N_i
 			Function rho = Function.getZeroFcn(domain);
@@ -68,11 +67,11 @@ public final class Main {
 				rho = psi.square().add(rho);
 			}
 			// update eigenvals to test for convergence
-			convTester.updateCurValues( ((SchrodingerSolver) solver).getEigenvalues() );
+			convTester.updateCurValues(sSolver.getEigenvalues() );
 			// solve poissons eqn
-			solver = new SORSolver(params, rho);
+			PoissonSolver pSolver = new SORSolver(params, rho);
 			// implicitly scaled by electron charge, which is 1
-			electronPotential = solver.solve()[0];
+			electronPotential = pSolver.solve();
 		} while (!convTester.hasConverged());
 		
 		/* TODO
@@ -102,22 +101,23 @@ public final class Main {
 		 */
 	}
 	
+	//TODO: java doesn't have progName as arg[0] so this shouldn't take an argument
 	public static void usage(String progName) {
 		System.out.println("\n"+versionStr);
-		System.out.println("Usage:");
-		System.out.println(progName+" "+usageStr);
+		System.out.println("Usage: "+progName+" "+usageStr);
 	}
 	
+	//TODO: credit lapack if we end up using the 'dstemr' routine
 	private static final String versionStr = 
 			"Version: "+MAJOR_VER_NUM+"."+MINOR_VER_NUM+"\n"
-			+ "Author: Mark Sholte\n"
-			+ "Date: 20 December 2013";
+			+ "Authors: Mark Sholte, Matthew Butcher\n"
+			+ "Date: 17 February 2014";
 	
 	private static final String usageStr = 
 			"<parameter_file>\n"
-			+ "parameter_file should be a plaintext file that describes the parameters describing the well. "
-			+ "The parameters should include the widths and bandgaps of each layer in the well, the step size, "
-			+ "the effective masses, the relative dielectric constants, and the relative error tolerance for "
-			+ "to determine when the self-consistent cycle has converged.";
+			+ "\t<parameter_file> should be a plaintext file containing the parameters describing the well in "
+			+ "key-value pair format. The parameters should include the widths and bandgaps of each layer in "
+			+ "the well, the step size, the effective masses, the relative dielectric constants, and the "
+			+ "relative error tolerance to determine when the self-consistent cycle has converged.";
 
 }
