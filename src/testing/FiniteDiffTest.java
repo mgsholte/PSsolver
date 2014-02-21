@@ -52,12 +52,15 @@ public class FiniteDiffTest {
 
 		Function approxGndState = solver.solveSystem()[0];
 		
+		// check eigenvalues
 		double[] eigvals = solver.getEigenvalues();
 		for(int i = 0; i < eigvals.length; ++i) {
 			assertEquals(0.5+i, eigvals[i], 0.01);
 		}
 		
+		// check eigenvects
 		assertArrayEquals(groundState.toArray(), approxGndState.toArray(), 0.1);
+		
 	}
 
 }
