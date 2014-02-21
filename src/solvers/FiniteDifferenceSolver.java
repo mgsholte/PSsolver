@@ -3,6 +3,11 @@ package solvers;
 /***Solves for energies and eigenstates using the finite difference method
  * 
  */
+import javax.xml.ws.soap.MTOM;
+
+import no.uib.cipr.matrix.SymmTridiagMatrix;
+import no.uib.cipr.matrix.TridiagMatrix;
+import no.uib.cipr.matrix.sparse.CompColMatrix;
 import utils.Function;
 import utils.GreedyFunction;
 import utils.WellParameters;
@@ -10,6 +15,7 @@ import utils.WellParameters;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 import com.sun.jna.NativeLong;
+import com.sun.jna.Platform;
 
 public class FiniteDifferenceSolver extends SchrodingerSolver {
 
@@ -57,9 +63,9 @@ public class FiniteDifferenceSolver extends SchrodingerSolver {
 		final int M = numEvsFound.intValue();
 		Function[] ans = new GreedyFunction[M];
 		double[] tmp = new double[N];
-		for(int i = 0; i < M; ++i) {
-			System.arraycopy(eigfcns, i*N, tmp, 0, N);
-			ans[i] = new GreedyFunction(potential.getDomain(), tmp);
+		for(int j = 0; j < M; ++j) {
+			System.arraycopy(eigfcns, j*N, tmp, 0, N);
+			ans[j] = new GreedyFunction(potential.getDomain(), tmp);
 		}
 		
 		return ans;
@@ -74,8 +80,14 @@ public class FiniteDifferenceSolver extends SchrodingerSolver {
 				NativeLong info);
 	
 	static {
-		NativeLibrary.addSearchPath("lapack", "bin/");
-		Native.register("lapack");
+		//TODO: can't find dependent libraries
+		System.load("liblapack.dll");
+//		NativeLibrary.addSearchPath("libopenblas", "bin/");
+		NativeLibrary.addSearchPath("liblapack", "bin/");
+//		NativeLibrary.addSearchPath("liblapacke", "bin/");
+//		Native.register("libblas");
+		Native.register("liblapack");
+//		Native.register("liblapacke");
 	}
 
 }

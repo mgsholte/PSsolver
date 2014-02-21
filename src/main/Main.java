@@ -1,7 +1,6 @@
 package main;
 
 import solvers.FiniteDifferenceSolver;
-import solvers.ODESolver;
 import solvers.PoissonSolver;
 import solvers.SORSolver;
 import solvers.SchrodingerSolver;

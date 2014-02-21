@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.sun.org.apache.xml.internal.resolver.helpers.Debug;
-
 /**
  * Domains are contiguous subsets of the real numbers
  * @author Mark

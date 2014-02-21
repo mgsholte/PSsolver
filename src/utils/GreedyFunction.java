@@ -30,6 +30,11 @@ public class GreedyFunction extends Function {
 	}
 
 	@Override
+	public double evalAtIdx(int i) {
+		return vals[i];
+	}
+
+	@Override
 	public Function add(Function f) {
 		testDomain(f);
 		double[] sum = new double[vals.length];

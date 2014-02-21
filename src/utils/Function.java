@@ -21,7 +21,26 @@ public abstract class Function {
 		return domain;
 	}
 	
+	/**
+	 * Evaluate the function at the given point
+	 * @param x
+	 * @return
+	 */
 	abstract public double evalAt(double x);
+	
+	/**
+	 * Evaluate the function at the given index. That is, at the x value of
+	 * the i-th point in the domain. <br><br> 
+	 * 
+	 * Default implementation gets the value 
+	 * in the domain at the given index and passes that to {@link#evalAt(double)}
+	 * 
+	 * @param i - the index at which to evaluate the function
+	 * @return the value of the function, f(x), where x = {@code domain.getValAtIndex(i)}
+	 */
+	public double evalAtIdx(int i) {
+		return evalAt(domain.getValAtIndex(i));
+	}
 	
 	abstract public Function add(Function f) throws DomainMismatchException;
 	
