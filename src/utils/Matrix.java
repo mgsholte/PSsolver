@@ -9,6 +9,20 @@ package utils;
 public abstract class Matrix {
 	
 	protected int dim;
+	
+	//return the Identity as a dense matrix
+	public static DenseMatrix getIdentity(int dim){
+		double[][] matParam = new double[dim][dim];
+		for(int row = 0; row < dim; row++){
+			for(int col = 0; col < dim; col++){
+				if(row == col)
+					matParam[row][col] = 1.0;
+				else
+					matParam[row][col] = 0.0;
+			}
+		}
+		return new DenseMatrix(dim, matParam);
+	}
 
 	//getters
 	public int getDim(){
@@ -26,10 +40,30 @@ public abstract class Matrix {
 		return result;
 	}
 	
+	//tests the matrix to see if off-diagonal entries are zero to within a given tolerance
+	public boolean isDiagonal(double tolerance){
+		for(int row = 0; row < dim; row++){
+			for(int col = 0; col < dim; col++){
+				if(row != col && Math.abs(this.evalAt(row, col)) > tolerance)
+					return false;
+			}
+		}
+		return true;
+	}
+	
 	//isEqual:  all vals are the same
-	public abstract boolean isEqual(Matrix compare);
+	public boolean isEqual(Matrix compare, double tolerance){
+		if (dim != compare.getDim()) return false;
+		for (int row = 0; row < dim; row++)
+			for (int col = 0; col < dim; col++)
+				if (Math.abs(this.evalAt(row, col) - compare.evalAt(row, col)) > tolerance)
+					return false;
+		return true;
+	}
 	
 	//basic operations
+	public abstract Matrix transpose();
+	
 	public abstract double evalAt(int row, int col);
 	
 	public abstract void changeVal(int row, int col, double newVal);
@@ -38,18 +72,13 @@ public abstract class Matrix {
 	
 	public abstract void add(Matrix m);
 	
-//	//this.matMult(m) = this*m and m.matMult(this) = m*this (matMult = left multiplication)
-//	public Matrix matMult(Matrix m){
-//		double[][] newVals = new double[vals.length][vals.length];
-//		for(int i = 0; i < newVals.length; i++){
-//			for(int j = 0; j < newVals.length; j++){
-//				double sum = 0;
-//				for(int k = 0; k < newVals.length; k++){
-//					sum += this.vals[i][k]*m.evalAt(k, j);
-//				}
-//				newVals[i][j] = sum;
-//			}
-//		}
-//		return new Matrix(newVals);
-//	}
+	public abstract void multiply(Matrix m);
+	
+	public abstract void rotate(RotationMatrix p);
+
+	public void multiply(RotationMatrix p) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }

@@ -124,11 +124,7 @@ public class Domain implements Iterable<Double> {
 	 * @return true iff {@code lb} < {@code x} < {@code ub}
 	 */
 	public boolean contains(double x) {
-<<<<<<< HEAD
-		return lb <= x && x <= ub;//Matthew changed this to less or equal and greater or equal - is this ok?
-=======
 		return lb <= x && x <= ub;
->>>>>>> 036c8ac7e8cb35e0f769dd097ebb7ccc16869a82
 	}
 	
 	/**

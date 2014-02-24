@@ -30,14 +30,6 @@ public class WellParameters {
 		this(paramsFileName, defaultParamsFileName);
 	}
 	
-	/**
-	 * For creating fake param objects for easier testing
-	 */
-	private WellParameters(Domain d) {
-		//TODO: for testing only
-		this.domain = d;
-	}
-	
 	public static final WellParameters genDummyParams(Domain d) {
 		return new WellParameters(d);
 	}

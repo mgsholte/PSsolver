@@ -1,14 +1,15 @@
 package testing;
 
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import solvers.FiniteDifferenceSolver;
-import solvers.SchrodingerSolver;
-import solvers.ODESolver;
-import utils.*;
+import utils.Domain;
+import utils.Function;
+import utils.GreedyFunction;
+import utils.LazyFunction;
+import utils.SparseTridiag;
+import utils.WellParameters;
 
 public class FiniteDifferenceTest {
 	
