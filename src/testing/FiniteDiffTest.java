@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 package testing;
 
 import static org.junit.Assert.*;
@@ -66,6 +67,8 @@ public class FiniteDiffTest {
 
 }
 =======
+=======
+>>>>>>> 036c8ac7e8cb35e0f769dd097ebb7ccc16869a82
 package testing;
 
 import static org.junit.Assert.*;
@@ -132,4 +135,7 @@ public class FiniteDiffTest {
 	}
 
 }
+<<<<<<< HEAD
+>>>>>>> 036c8ac7e8cb35e0f769dd097ebb7ccc16869a82
+=======
 >>>>>>> 036c8ac7e8cb35e0f769dd097ebb7ccc16869a82
