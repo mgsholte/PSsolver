@@ -21,8 +21,25 @@ public class WellParameters {
 	
 	private Domain domain;
 	
+	//For manually setting parameters in solvers testing situations
+	public WellParameters(Domain d){
+		domain = d;
+	}
+	
 	public WellParameters(String paramsFileName) throws ParameterReadException {
 		this(paramsFileName, defaultParamsFileName);
+	}
+	
+	/**
+	 * For creating fake param objects for easier testing
+	 */
+	private WellParameters(Domain d) {
+		//TODO: for testing only
+		this.domain = d;
+	}
+	
+	public static final WellParameters genDummyParams(Domain d) {
+		return new WellParameters(d);
 	}
 	
 	//TODO: write default parameters file

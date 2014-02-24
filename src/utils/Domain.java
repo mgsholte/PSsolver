@@ -24,26 +24,62 @@ public class Domain implements Iterable<Double> {
 	}
 
 	public static final void setTolerance(double newTolerance) {
-		if (newTolerance > 0 && newTolerance < 1)
+		if (newTolerance > 0.0 && newTolerance < 1.0)
 			TOLERANCE = newTolerance;
 		else
 			System.err.println("Warning (Domain.setTolerance): cannot set tolerance to be outside the range (0,1). Ignoring attempt");
 	}
 
 	/** the lower and upper bounds of the domain */
-	private double lb, ub;
+	private final double lb, ub;
 	/** the uniform spacing between points in the domain */
-	private double dx;
+	private final double dx;
+	/** the number of points in the domain */
+	private final int N;
 	
 	//TODO: Can we change this so that it always sets the upper bound to be the higher x value?
-	public Domain(double lb, double ub, double dx) {
-		// if lb > ub, then dx < 0 should be true
-		this.lb = lb; this.ub = ub; this.dx = dx;
+	//yes, with Math.min and max. Is this useful?
+	/**
+	 * Construct a domain object with the given bounds and specified number of points.
+	 * Due to floating point precision, the upper bound may be modified slightly so that
+	 * it is exactly {@code lb + (N-1)*dx} where {@code dx} is the inferred spacing
+	 * 
+	 * @param lb - the lower bound
+	 * @param ub - the (approximate/requested) upper bound
+	 * @param N - the desired number of points including the lower and upper bounds
+	 */
+	public Domain(double lb, double ub, int N) {
+		N = (N < 2) ? 2 : N;
+		this.lb = lb; 
+		this.dx = (ub-lb)/(N-1); 
+		this.ub = lb + dx*(N-1);
+		this.N = N;
 	}
 	
-	 public double getDx() { return dx; }
-	 public double getUB() { return ub; }
-	 public double getLB() { return lb; }
+	/**
+	 * Contruct a domain object with the given bounds and specified step size. Due
+	 * to floting point precision, the upper bound may be modified so that it is exactly
+	 * {@code lb + (N-1)*dx} where {@code N} is the inferred number of points (including the
+	 * 2 boundary points)
+	 * 
+	 * @param lb - the lower bound
+	 * @param ub - the (approximate/requested) upper bound
+	 * @param dx - the step size
+	 */
+	public Domain(double lb, double ub, double dx) {
+		this.lb = lb;
+		this.dx = dx;
+		int tmpN = (int) ((ub - lb)/dx);
+		this.N = (lb + dx*tmpN) > (ub + dx/8.0) // allow some room for spill-over past ub
+				? tmpN
+				: tmpN + 1;
+		this.ub = lb + dx*(N-1);
+	}
+
+	public double getLB() { return lb; }
+	public double getUB() { return ub; }
+	public double getDx() { return dx; }
+	public int    getNumPoints() { return N; }
 
 	/**
 	 * Partition a domain into contiguous, non-overlapping sub-domains. The number of new domains
@@ -88,14 +124,18 @@ public class Domain implements Iterable<Double> {
 	 * @return true iff {@code lb} < {@code x} < {@code ub}
 	 */
 	public boolean contains(double x) {
-		return lb < x && x < ub;
+<<<<<<< HEAD
+		return lb <= x && x <= ub;//Matthew changed this to less or equal and greater or equal - is this ok?
+=======
+		return lb <= x && x <= ub;
+>>>>>>> 036c8ac7e8cb35e0f769dd097ebb7ccc16869a82
 	}
 	
 	/**
 	 * @param subD - the potential sub-domain
 	 * @return true iff {@code subD} is a sub-domain of this
 	 */
-	public boolean hasSubDomain(Domain subD) {
+	public boolean hasAsSubDomain(Domain subD) {
 		// check that subD falls inside bounds of this
 		if (subD.lb < lb || subD.ub > ub || subD.dx < dx)
 			return false;
@@ -106,10 +146,6 @@ public class Domain implements Iterable<Double> {
 		// check that subD.dx is an int multiple of dx
 		double ratio = subD.dx/dx;
 		return Math.abs(Math.round(ratio) - ratio) <= TOLERANCE;
-	}
-
-	public int getNumPoints() {
-		return (int) Math.floor((ub-lb)/dx);
 	}
 	
 	/**
@@ -146,7 +182,7 @@ public class Domain implements Iterable<Double> {
 
 		@Override
 		public boolean hasNext() {
-			return curPosition <= ub;
+			return curPosition <= ub + dx/8.0;
 		}
 
 		@Override

@@ -14,8 +14,8 @@ public abstract class ODESolver {
 
 	/**
 	 * Solve the ODE
-	 * @return the solutions 
+	 * @return the solution
 	 */
-	abstract public Function[] solve();
-
+	protected abstract Function solve(double param);
+	
 }

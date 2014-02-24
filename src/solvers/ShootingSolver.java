@@ -14,7 +14,7 @@ public class ShootingSolver extends SchrodingerSolver {
 	}
 
 	@Override
-	public Function[] solve() {
+	public Function[] solveSystem() {
 		Domain dom = params.getProblemDomain();
 		//create the function array and set up problem
 		Function[] psis = new Function[5];//TODO:  maybe change to an arraylist? don't know how many eigenstates there will be
@@ -23,13 +23,13 @@ public class ShootingSolver extends SchrodingerSolver {
 		double eLow = 0;
 		double eHi = eLow + DEL_E;
 		for (int i = 0; i < psis.length; i++){
-			Function shot1 = solveOneState(eLow);
-			Function shot2 = solveOneState(eHi);
+			Function shot1 = solve(eLow);
+			Function shot2 = solve(eHi);
 			//TODO: clean up the logic here
 			do {
 				if (shot1.evalAt(dom.getUB())*shot2.evalAt(dom.getUB()) < 0){
 					double eAvg = (eLow + eHi)/2;
-					Function shot3 = solveOneState(eAvg);
+					Function shot3 = solve(eAvg);
 					if (shot3.evalAt(dom.getUB())*shot2.evalAt(dom.getUB()) < 0){
 						shot1 = shot3;
 						eLow = eAvg;
@@ -40,7 +40,7 @@ public class ShootingSolver extends SchrodingerSolver {
 					}
 				}
 				else eHi += DEL_E;
-				shot2 = solveOneState(eHi);
+				shot2 = solve(eHi);
 			} while(shot1.evalAt(dom.getUB()) > Domain.getTolerance() && shot2.evalAt(dom.getUB()) > Domain.getTolerance());
 			psis[i] = shot1.evalAt(dom.getUB()) < shot2.evalAt(dom.getUB()) ? shot1 : shot2;
 		}
@@ -48,7 +48,12 @@ public class ShootingSolver extends SchrodingerSolver {
 		return psis;
 	}
 
-	protected Function solveOneState(double energyGuess) {
+	/**
+	 * Solve the potential for 1 wavefunction based on the given guess for the eigenenergy
+	 * 
+	 */
+	@Override
+	public Function solve(double energyGuess) {
 		Domain dom = params.getProblemDomain();
 		double[] initVals = new double[dom.getNumPoints()];
 		double h = dom.getDx();
