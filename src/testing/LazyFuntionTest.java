@@ -25,7 +25,7 @@ public class LazyFuntionTest {
 		
 		for(double x : id.getDomain()) {
 			assertEquals(x, id.evalAt(x), 0.0001);
-<<<<<<< HEAD
+
 		}
 		
 		
@@ -43,8 +43,7 @@ public class LazyFuntionTest {
 			if (x >= -1.0 && x <= 1.0)
 				assertEquals(V2.evalAt(x), 0.0, .0001);
 			else assertEquals(V2.evalAt(x), 1.0, .0001);
-=======
->>>>>>> 036c8ac7e8cb35e0f769dd097ebb7ccc16869a82
+
 		}
 		
 		Function sqWell = new LazyFunction(dom) {
@@ -95,25 +94,7 @@ public class LazyFuntionTest {
 		}
 	}
 	
-<<<<<<< HEAD
-	@Test
-	public void testToArray() {
-		Function square = new LazyFunction(dom) {
-			@Override
-			public double evalAt(double x) {
-				return x*x;
-			}
-		};
-		double[] squares = square.toArray();
-		
-		for (int i = 0; i < 5; ++i) {
-			double x = dom.getValAtIndex(i);
-			assertEquals(x*x, squares[i], 0.0001);
-		}
-	}
-	
-=======
->>>>>>> 036c8ac7e8cb35e0f769dd097ebb7ccc16869a82
+
 	
 
 }

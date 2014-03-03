@@ -27,6 +27,10 @@ public class SparseTridiag extends Matrix {
 		dim = n;
 		rPortion = new double[n - 2];
 	}
+	
+	public double[] getDiag(){
+		return diag.clone();
+	}
 
 	@Override
 	public boolean isEqual(Matrix compare, double tolerance) {
@@ -83,24 +87,31 @@ public class SparseTridiag extends Matrix {
 	@Override
 	// THIS ONLY WORKS IF YOU'RE EXPECTING TO GET A SYMMETRIC TRIDIAGONAL AS A
 	// RESULT
+	//Method is kind of a mess but it's much faster than going through every index
 	public void multiply(Matrix m) {
-		double[] upper1 = upper;
-		double[] diag1 = diag;
-		for (int i = 0; i < dim - 2; i++) {
-			upper1[i] = diag[i] * m.evalAt(i, i + 1) + upper[i]
-					* m.evalAt(i + 1, i + 1) * rPortion[i]
-					* m.evalAt(i + 2, i + 1);
-			diag1[i] = diag[i] * m.evalAt(i, i) + upper[i] * m.evalAt(i + 1, i)
-					* rPortion[i] * m.evalAt(i + 2, i);
+		double[] upper1 = upper.clone();
+		double[] diag1 = diag.clone();
+		upper1[0] = diag[0] * m.evalAt(0,1) + upper[0] * m.evalAt(1,1) + rPortion[0] * m.evalAt(2, 1);
+		diag1[0] = diag[0] * m.evalAt(0,0) + upper[0] * m.evalAt(1,0) + rPortion[0] * m.evalAt(2, 0);
+		for (int i = 1; i < dim - 2; i++) {
+			upper1[i] = lower[i - 1]*m.evalAt(i - 1, i + 1)
+					+ diag[i] * m.evalAt(i, i + 1) 
+					+ upper[i] * m.evalAt(i + 1, i + 1) 
+					+ rPortion[i] * m.evalAt(i + 2, i + 1);
+			diag1[i] = lower[i - 1]*m.evalAt(i - 1, i)
+					+ diag[i] * m.evalAt(i, i) 
+					+ upper[i] * m.evalAt(i + 1, i)
+					+ rPortion[i] * m.evalAt(i + 2, i);
 		}
 		upper1[dim - 2] = diag[dim - 2] * m.evalAt(dim - 2, dim - 1)
 				+ upper[dim - 2] * m.evalAt(dim - 1, dim - 1);
-		diag1[dim - 2] = diag[dim - 2] * m.evalAt(dim - 2, dim - 2)
+		diag1[dim - 2] = lower[dim - 3] * m.evalAt(dim - 3, dim - 2)
+				+ diag[dim - 2] * m.evalAt(dim - 2, dim - 2)
 				+ upper[dim - 2] * m.evalAt(dim - 1, dim - 2);
-		diag1[dim - 1] = diag[dim - 1] * m.evalAt(dim - 1, dim - 1);
-		lower = upper1;
+		diag1[dim - 1] = lower[dim - 2] * m.evalAt(dim - 2, dim - 1) + diag[dim - 1] * m.evalAt(dim - 1, dim - 1);
+		lower = upper1.clone();
 		diag = diag1;
-		upper = upper1;
+		upper = upper1.clone();
 		rPortion = new double[dim - 2];
 	}
 
@@ -112,7 +123,6 @@ public class SparseTridiag extends Matrix {
 					+ p.evalAt(k, k + 1) * this.evalAt(k + 1, col);
 			double valRowK1 = p.evalAt(k + 1, k) * this.evalAt(k, col)
 					+ p.evalAt(k + 1, k + 1) * this.evalAt(k + 1, col);
-			System.out.println(valRowK + " " + valRowK1);
 			this.changeVal(k, col, valRowK);
 			this.changeVal(k + 1, col, valRowK1);
 		}

@@ -40,6 +40,13 @@ public abstract class Matrix {
 		return result;
 	}
 	
+	public double[] getCol(int col){
+		double[] colVals = new double[dim];
+		for(int i = 0; i < dim; i++)
+			colVals[i] = this.evalAt(i, col);
+		return colVals;
+	}
+	
 	//tests the matrix to see if off-diagonal entries are zero to within a given tolerance
 	public boolean isDiagonal(double tolerance){
 		for(int row = 0; row < dim; row++){

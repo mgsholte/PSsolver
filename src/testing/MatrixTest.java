@@ -19,6 +19,7 @@ public class MatrixTest {
 	double[][] vals1 = {{1.0, 2.0, 3.0}, {0.0, 1.0, 0.0}, {3.0, 1.5, 2.5}};
 	double[][] vals2 = {{-2.0, 1.0, 0.0}, {1.0, -2.0, 1.0}, {0.0, 1.0, -2.0}};
 	double[][] vals3 = {{-2.0, 1.0, 0.0, 0.0}, {1.0, -3.0, -1.0, 0.0}, {0.0, -1.0, 1.0, 1.0}, {0.0, 0.0, 1.0, 3.0}};
+	double[][] vals4 = {{-2.0, 1.0, 0.0, 0.0}, {1.0, -3.0, -1.0, 0.0}, {0.0, -1.0, 1.0, 1.0}, {0.0, 0.0, 1.0, 3.0}};
 	double[] finDiff1 = {-2.0, -2.0, -2.0, -2.0};
 	double[] finDiff2 = {1.0, 1.0, 1.0};
 	
@@ -26,8 +27,9 @@ public class MatrixTest {
 	public void setUp() throws Exception {
 		m1 = new DenseMatrix(3, vals1);
 		m2 = new DenseMatrix(3, vals2);
-		m3 = new DenseMatrix(4, vals3);
+		m3 = new DenseMatrix(4, vals3.clone());
 		m4 = new SparseTridiag(4, finDiff2, finDiff1, finDiff2.clone());
+		m5 = new DenseMatrix(4, vals4.clone());
 	}
 
 	@Test
@@ -36,6 +38,7 @@ public class MatrixTest {
 		System.out.println(m2);
 		System.out.println(m3);
 		System.out.println(m4);
+		System.out.println(m5);
 		System.out.println("Should only see matrices and no memory addresses");
 	}
 	
@@ -89,7 +92,6 @@ public class MatrixTest {
 		m3.multiply(p2);
 		double[][] result4 = {{-1.5, -.25, -.125, -.125}, {2.0, 0.0, -.5, -.5}, {.5, -.75, -.375, .625}, {0.0, -.5, -1.25, 1.75}};
 		assertTrue(m3.isEqual(new DenseMatrix(m3.getDim(), result4), .0001));
-		
 	}
 	
 	@Test
@@ -97,10 +99,7 @@ public class MatrixTest {
 		RotationMatrix p0 = new RotationMatrix(4, 0, .5, .5);
 		RotationMatrix p1 = new RotationMatrix(3, 1, .5, .5);
 		RotationMatrix p2 = new RotationMatrix(4, 2, .5, .5);
-		System.out.println(m4);
-		System.out.println(p0);
 		m4.rotate(p0);
-		System.out.println(m4);
 		double[][] result0 = {{-.5, -.5, .5, 0.0}, {1.5, -1.5, .5, 0.0}, {0.0, 1.0, -2.0, 1.0}, {0.0, 0.0, 1.0, -2.0}};
 		assertTrue(m4.isEqual(new DenseMatrix(m4.getDim(), result0), .0001));
 	}

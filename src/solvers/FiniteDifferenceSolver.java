@@ -5,33 +5,42 @@ package solvers;
  */
 import java.util.Map;
 
-import no.uib.cipr.matrix.DenseVectorSub;
-import no.uib.cipr.matrix.SymmTridiagMatrix;
-import no.uib.cipr.matrix.sparse.ArpackSym;
+
+import utils.DenseMatrix;
+//import no.uib.cipr.matrix.DenseVectorSub;
+//import no.uib.cipr.matrix.SymmTridiagMatrix;
+//import no.uib.cipr.matrix.sparse.ArpackSym;
 import utils.Function;
-<<<<<<< HEAD
 import utils.Matrix;
 import utils.RotationMatrix;
 import utils.SparseTridiag;
-=======
 import utils.GreedyFunction;
->>>>>>> 036c8ac7e8cb35e0f769dd097ebb7ccc16869a82
 import utils.WellParameters;
+import utils.Domain;
 
 public class FiniteDifferenceSolver extends SchrodingerSolver {
 
-<<<<<<< HEAD
 	private final int dim;
 	private final double delX;
+	private double[] eigVals;
 	
 	public FiniteDifferenceSolver(WellParameters params, Function potential) {
 		super(params, potential);
 		dim = params.getProblemDomain().getNumPoints();
 		delX = params.getProblemDomain().getDx();
+		eigVals = new double[dim];
 	}
 	
 	public int getDim(){
 		return dim;
+	}
+	
+	public double[] getEigs(){
+		return eigVals;
+	}
+	
+	public Function getBGPotential(){
+		return potential;
 	}
 	
 	//Steps:  Using the domain and potential function, generate a finite difference matrix
@@ -40,9 +49,14 @@ public class FiniteDifferenceSolver extends SchrodingerSolver {
 	@Override
 	public Function[] solveSystem() {
 		int numStates = 5; //number of states to find, can be changed later to be more flexible
+		if(numStates > dim)
+			throw new IllegalArgumentException("Domain resolution too low to solve for " + numStates + " states.");
 		SparseTridiag H = new SparseTridiag(dim, genHOffDiag(),  genHDiag(), genHOffDiag() );
 		Matrix eigStates = diagonalize(H);
-		return null;
+		Function[] psis = new Function[numStates];
+		for (int i = 0; i < numStates; i++)
+			psis[i] = new GreedyFunction(params.getProblemDomain(), eigStates.getCol(dim - 1 - i));
+		return psis;
 	}
 	
 	//TODO include effective mass and not just standard electron mass, change these to private
@@ -65,72 +79,77 @@ public class FiniteDifferenceSolver extends SchrodingerSolver {
 	//Takes a matrix A and uses the QR method to diagonalize: check if diagonal, generate series of rotation matrices and 
 	//left multiply them repeatedly, updating Q at each step.  At the end do R*Q and loop back again
 	//returns matrix containing the eigenvectors
-	public Matrix diagonalize(Matrix A) {
+	public Matrix diagonalize(SparseTridiag A) {
 		int n = A.getDim();
-		Matrix Q = Matrix.getIdentity(n);
-		while (!A.isDiagonal(.001)){//Domain.getTolerance())){//TODO:  check if tolerance will work
-			Q = Matrix.getIdentity(n);
+		Matrix Q = Matrix.getIdentity(n);//Q_temp is reinitialized for each iteration, Q builds the eigenvectors
+		DenseMatrix Q_temp = new DenseMatrix(n);
+		while (!A.isDiagonal(Domain.getTolerance())){//TODO:  check if tolerance will work
+			Q_temp = Matrix.getIdentity(n);
 			for (int i = 0; i < n - 1; i++){//because we need n-1 rotations
 				double b_k1 = A.evalAt(i + 1, i);
 				double x_k = A.evalAt(i, i);
 				RotationMatrix p_i = new RotationMatrix(n, i, b_k1/Math.sqrt(b_k1*b_k1 + x_k*x_k), x_k/Math.sqrt(b_k1*b_k1 + x_k*x_k));
 				//parameters create a rotation matrix that gives A a zero entry directly below the entry at (i,i)
 				Q.multiply(p_i.transpose());
+				Q_temp.multiply(p_i.transpose());
 				A.rotate(p_i);
 			}
-			A.multiply(Q);
+			A.multiply(Q_temp);
 		}
+		double[] rvrseOrderEigs = A.getDiag();//eigVals going from high to low
+		for(int i = 0; i < dim; i++)
+			eigVals[i] = rvrseOrderEigs[dim - 1 - i];
 		return Q;
 	}
 
-=======
-	public FiniteDifferenceSolver(WellParameters params, Function potential) {
-		super(params, potential);
-		eigenvalues = new double[params.getProblemDomain().getNumPoints()]; // bigger than needed
-	}
-	
-	@Override
-	public Function[] solveSystem() {
-		// minimally define Hamiltonian matrix (it is symmetric and tridiagonal)
-		double[] diag = potential.toArray();
-		final int N = diag.length;
-		double[] offDiag = new double[N]; // 1 extra length needed by called library code
-		
-		// initialize diag and subDiag
-		for(int i = 0; i < N; ++i) {
-			// diag elems == 2*K_E_C + potential at that point
-			diag[i] +=  2*KIN_ENGY_COEFF;
-			offDiag[i] = -KIN_ENGY_COEFF;
-		}
-		
-		// solve for the specified number of smallest eigenpairs
-		int numEvsDesired = 5;
-		Map<Double, DenseVectorSub> eigenpairs = 
-				new ArpackSym(new SymmTridiagMatrix(diag, offDiag)).solve(numEvsDesired, ArpackSym.Ritz.SM);
-		//
-		// recover eigenpairs in a form compatible with the rest of the program
-		//
-		// eigenvalues 1st
-		Double[] tmp_eigvals = (Double[]) eigenpairs.keySet().toArray();
-		eigenvalues = new double[tmp_eigvals.length];
-		for(int i = 0; i < tmp_eigvals.length; ++i) {
-			eigenvalues[i] = tmp_eigvals[i].doubleValue();
-		}
-		// now eigenvects
-		Function[] ans = new GreedyFunction[eigenvalues.length];
-		double[] tmp_eigvect = new double[N];
-		for(int i = 0; i < ans.length; ++i) {
-			// convert DenseVectorSub to double[]
-			DenseVectorSub eigvect = eigenpairs.get(eigenvalues[i]);
-			for(int j = 0; j < tmp_eigvect.length; ++j) {
-				tmp_eigvect[i] = eigvect.get(j);
-			}
-			// convert double[] to Function and add to solution array
-			ans[i] = new GreedyFunction(potential.getDomain(), tmp_eigvect);
-		}
-		
-		return ans;
-	}
-	
->>>>>>> 036c8ac7e8cb35e0f769dd097ebb7ccc16869a82
+//=======
+//	public FiniteDifferenceSolver(WellParameters params, Function potential) {
+//		super(params, potential);
+//		eigenvalues = new double[params.getProblemDomain().getNumPoints()]; // bigger than needed
+//	}
+//	
+//	@Override
+//	public Function[] solveSystem() {
+//		// minimally define Hamiltonian matrix (it is symmetric and tridiagonal)
+//		double[] diag = potential.toArray();
+//		final int N = diag.length;
+//		double[] offDiag = new double[N]; // 1 extra length needed by called library code
+//		
+//		// initialize diag and subDiag
+//		for(int i = 0; i < N; ++i) {
+//			// diag elems == 2*K_E_C + potential at that point
+//			diag[i] +=  2*KIN_ENGY_COEFF;
+//			offDiag[i] = -KIN_ENGY_COEFF;
+//		}
+//		
+//		// solve for the specified number of smallest eigenpairs
+//		int numEvsDesired = 5;
+//		Map<Double, DenseVectorSub> eigenpairs = 
+//				new ArpackSym(new SymmTridiagMatrix(diag, offDiag)).solve(numEvsDesired, ArpackSym.Ritz.SM);
+//		//
+//		// recover eigenpairs in a form compatible with the rest of the program
+//		//
+//		// eigenvalues 1st
+//		Double[] tmp_eigvals = (Double[]) eigenpairs.keySet().toArray();
+//		eigenvalues = new double[tmp_eigvals.length];
+//		for(int i = 0; i < tmp_eigvals.length; ++i) {
+//			eigenvalues[i] = tmp_eigvals[i].doubleValue();
+//		}
+//		// now eigenvects
+//		Function[] ans = new GreedyFunction[eigenvalues.length];
+//		double[] tmp_eigvect = new double[N];
+//		for(int i = 0; i < ans.length; ++i) {
+//			// convert DenseVectorSub to double[]
+//			DenseVectorSub eigvect = eigenpairs.get(eigenvalues[i]);
+//			for(int j = 0; j < tmp_eigvect.length; ++j) {
+//				tmp_eigvect[i] = eigvect.get(j);
+//			}
+//			// convert double[] to Function and add to solution array
+//			ans[i] = new GreedyFunction(potential.getDomain(), tmp_eigvect);
+//		}
+//		
+//		return ans;
+//	}
+//	
+//>>>>>>> 036c8ac7e8cb35e0f769dd097ebb7ccc16869a82
 }
