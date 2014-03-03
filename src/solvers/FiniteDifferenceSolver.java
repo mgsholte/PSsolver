@@ -3,9 +3,15 @@ package solvers;
 /***Solves for energies and eigenstates using the finite difference method
  * 
  */
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
 
+
+
+
+import main.Main;
 import utils.DenseMatrix;
 //import no.uib.cipr.matrix.DenseVectorSub;
 //import no.uib.cipr.matrix.SymmTridiagMatrix;
@@ -22,21 +28,16 @@ public class FiniteDifferenceSolver extends SchrodingerSolver {
 
 	private final int dim;
 	private final double delX;
-	private double[] eigVals;
 	
 	public FiniteDifferenceSolver(WellParameters params, Function potential) {
 		super(params, potential);
 		dim = params.getProblemDomain().getNumPoints();
 		delX = params.getProblemDomain().getDx();
-		eigVals = new double[dim];
+		eigenvalues = new double[dim];
 	}
 	
 	public int getDim(){
 		return dim;
-	}
-	
-	public double[] getEigs(){
-		return eigVals;
 	}
 	
 	public Function getBGPotential(){
@@ -47,12 +48,11 @@ public class FiniteDifferenceSolver extends SchrodingerSolver {
 	//Then, use the QR method to diagonalize, giving the energy eigenvalues.  Then find some
 	//predetermined number of lowest energy eigenstates and return an array containing them
 	@Override
-	public Function[] solveSystem() {
-		int numStates = 5; //number of states to find, can be changed later to be more flexible
+	public Function[] solveSystem(int numStates) {
 		if(numStates > dim)
 			throw new IllegalArgumentException("Domain resolution too low to solve for " + numStates + " states.");
 		SparseTridiag H = new SparseTridiag(dim, genHOffDiag(),  genHDiag(), genHOffDiag() );
-		Matrix eigStates = diagonalize(H);
+		Matrix eigStates = diagonalize(H, numStates);
 		Function[] psis = new Function[numStates];
 		for (int i = 0; i < numStates; i++)
 			psis[i] = new GreedyFunction(params.getProblemDomain(), eigStates.getCol(dim - 1 - i));
@@ -65,7 +65,7 @@ public class FiniteDifferenceSolver extends SchrodingerSolver {
 		//hbar^2/2m = 1 / KIN_ENGY_COEFF
 		double[] diag = new double[dim];
 		for (int i = 0; i < dim; i++)
-			diag[i] = 2.0 / (KIN_ENGY_COEFF*delX*delX) + potential.evalAt(potential.getDomain().getValAtIndex(i));
+			diag[i] = 2.0 / (KIN_ENGY_COEFF*delX*delX) + potential.evalAtIdx(i);
 		return diag;
 	}
 	
@@ -79,11 +79,13 @@ public class FiniteDifferenceSolver extends SchrodingerSolver {
 	//Takes a matrix A and uses the QR method to diagonalize: check if diagonal, generate series of rotation matrices and 
 	//left multiply them repeatedly, updating Q at each step.  At the end do R*Q and loop back again
 	//returns matrix containing the eigenvectors
-	public Matrix diagonalize(SparseTridiag A) {
+	public Matrix diagonalize(SparseTridiag A, int numStates) {
 		int n = A.getDim();
+		int numIters = 0;
 		Matrix Q = Matrix.getIdentity(n);//Q_temp is reinitialized for each iteration, Q builds the eigenvectors
 		DenseMatrix Q_temp = new DenseMatrix(n);
-		while (!A.isDiagonal(Domain.getTolerance())){//TODO:  check if tolerance will work
+//		while (!A.isDiagonal(Domain.getTolerance())){//TODO:  check if tolerance will work
+		while (!isConverged(A, numStates)) {	
 			Q_temp = Matrix.getIdentity(n);
 			for (int i = 0; i < n - 1; i++){//because we need n-1 rotations
 				double b_k1 = A.evalAt(i + 1, i);
@@ -95,11 +97,28 @@ public class FiniteDifferenceSolver extends SchrodingerSolver {
 				A.rotate(p_i);
 			}
 			A.multiply(Q_temp);
+			++numIters;
 		}
-		double[] rvrseOrderEigs = A.getDiag();//eigVals going from high to low
+		double[] rvrseOrderEigs = A.getDiag(); //eigVals going from high to low
 		for(int i = 0; i < dim; i++)
-			eigVals[i] = rvrseOrderEigs[dim - 1 - i];
+			eigenvalues[i] = rvrseOrderEigs[dim - 1 - i];
+		// TODO: this should work for getting the eigVals in reverse order
+//		eigenvalues = A.getDiag();
+//		Collections.reverse(Arrays.asList(eigenvalues));
 		return Q;
+	}
+
+	private boolean isConverged(SparseTridiag a, int numStates) {
+		final double tolerance = 1E-20; 
+		boolean ans = true;
+		int n = a.getDim();
+		for(int i = 0; i < numStates; ++i) {
+			double[] col = a.getCol(n-1 - i);
+			ans &= (Math.abs(col[n-2-i]) < tolerance); // check superdiag
+			col = a.getCol(n-2-i);
+			ans &= (Math.abs(col[n-i-1]) < tolerance); // check subdiag
+		}
+		return ans;
 	}
 
 //=======

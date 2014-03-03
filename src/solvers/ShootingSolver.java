@@ -14,15 +14,15 @@ public class ShootingSolver extends SchrodingerSolver {
 	}
 
 	@Override
-	public Function[] solveSystem() {
+	public Function[] solveSystem(int numStates) {
 		Domain dom = params.getProblemDomain();
 		//create the function array and set up problem
-		Function[] psis = new Function[5];//TODO:  maybe change to an arraylist? don't know how many eigenstates there will be
+		Function[] psis = new Function[numStates];//TODO:  maybe change to an arraylist? don't know how many eigenstates there will be
 		//Start at E = 0.  Check if E and E + delE end on opposite sides of the x axis. If they do, average them and
 		//of the three energy guesses solve the state for the two remaining x axis straddlers. Do until a state ends close to 0
 		double eLow = 0;
 		double eHi = eLow + DEL_E;
-		for (int i = 0; i < psis.length; i++){
+		for (int i = 0; i < numStates; i++){
 			Function shot1 = solve(eLow);
 			Function shot2 = solve(eHi);
 			//TODO: clean up the logic here

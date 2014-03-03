@@ -58,7 +58,7 @@ public final class Main {
 			// solve schrodingers eqn
 			totalPotential = electronPotential.add(params.getBgPotential());
 			SchrodingerSolver sSolver = new FiniteDifferenceSolver(params, totalPotential);
-			Function[] psis = sSolver.solveSystem();
+			Function[] psis = sSolver.solveSystem(5); // TODO: decide how many states to find
 			// get areal chg density
 			//TODO: take into account N_i
 			Function rho = Function.getZeroFcn(domain);

@@ -35,8 +35,8 @@ public class FiniteDifferenceTest {
 	public void setUp() throws Exception {
 		d1 = new Domain(-50.0, 50.0, .1);
 		d2 = new Domain(-5.0, 5.0, 50);//toy example
-		p1 = new WellParameters(d1);
-		p2 = new WellParameters(d2);//toy example
+		p1 = WellParameters.genDummyParams(d1);
+		p2 = WellParameters.genDummyParams(d2);//toy example
 		V1 = Function.getZeroFcn(d1);//infinite well
 		V2 = new LazyFunction(d1){//finite well
 								public double evalAt(double x){
@@ -69,13 +69,13 @@ public class FiniteDifferenceTest {
 	
 	@Test
 	public void testSolveSystem(){
-		Function[] infWellSparsePsis = s3.solveSystem();
-		Function[] finWellSparsePsis = s4.solveSystem();
+		Function[] infWellSparsePsis = s3.solveSystem(5);
+		Function[] finWellSparsePsis = s4.solveSystem(5);
 		int i = 0;
 		System.out.println("*****Infinite Well*****");
 		System.out.println("VInf = " + Arrays.toString(s3.getBGPotential().toArray()) + ";");
 		for(Function psi : infWellSparsePsis){
-			System.out.println("EInf" + i + " = " + s3.getEigs()[i] + ";");
+			System.out.println("EInf" + i + " = " + s3.getEigenvalues()[i] + ";");
 			System.out.println("PsiInf" + i + "=  " + Arrays.toString(psi.toArray()) + ";");
 			i++;
 		}
@@ -83,7 +83,7 @@ public class FiniteDifferenceTest {
 		System.out.println("VFin = " + Arrays.toString(s4.getBGPotential().toArray()) + ";");
 		i = 0;
 		for(Function psi : finWellSparsePsis){
-			System.out.println("EFin" + i + " = " + s4.getEigs()[i] + ";");
+			System.out.println("EFin" + i + " = " + s4.getEigenvalues()[i] + ";");
 			System.out.println("PsiFin" + i + "=  " + Arrays.toString(psi.toArray()) + ";");
 			i++;
 		}

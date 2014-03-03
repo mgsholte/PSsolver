@@ -23,7 +23,7 @@ public abstract class SchrodingerSolver extends ODESolver {
 		super(params, potential);
 	}
 	
-	abstract public Function[] solveSystem();
+	abstract public Function[] solveSystem(int numStates);
 	
 	/**
 	 * default, do-nothing implementation
