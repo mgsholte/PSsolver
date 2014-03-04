@@ -6,14 +6,10 @@ import utils.WellParameters;
 
 public abstract class SchrodingerSolver extends ODESolver {
 
-//	public static final double KIN_ENGY_COEFF = 1/3.81; // 2*m_e/hbar^2 in units of 1/(ev*A^2)
-	//TODO: move this somewhere else?
-//	public static final double HBAR = 6.582E-16; // in eV*s
-	//TODO: for testing purposes only
-	public static final double KIN_ENGY_COEFF = 1.0; // 2*m_e/hbar^2 in units of 1/(ev*A^2)
-	public static final double HBAR = 1.0; // in eV*s
+	//TODO: for testing purposes only. find true value for release
+	private static final double HBAR_SQ_2_M = 1.0/2.0; // hbar^2/(2*m_e) in units of ev/A^2
 	
-	public static final double DEL_E = .005; // in eV
+	protected final double kinEngyCoeff;
 	
 	//TODO: there is probably a better way to handle the eigenvals
 	//TODO: initialize when used since we don't know how many evs will be found a priori
@@ -21,6 +17,8 @@ public abstract class SchrodingerSolver extends ODESolver {
 	
 	public SchrodingerSolver(WellParameters params, Function potential) {
 		super(params, potential);
+		final double dxInv = 1.0/params.getProblemDomain().getDx();
+		kinEngyCoeff = HBAR_SQ_2_M*dxInv*dxInv;
 	}
 	
 	abstract public Function[] solveSystem(int numStates);

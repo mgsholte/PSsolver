@@ -1,7 +1,5 @@
 package testing;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 
 import org.junit.Before;
@@ -10,11 +8,8 @@ import org.junit.Test;
 import solvers.FiniteDifferenceSolver;
 import utils.Domain;
 import utils.Function;
-import utils.GreedyFunction;
 import utils.LazyFunction;
-import utils.SparseTridiag;
 import utils.WellParameters;
-import utils.Matrix;
 
 public class FiniteDifferenceTest {
 	
@@ -73,14 +68,14 @@ public class FiniteDifferenceTest {
 		Function[] finWellSparsePsis = s4.solveSystem(5);
 		int i = 0;
 		System.out.println("*****Infinite Well*****");
-		System.out.println("VInf = " + Arrays.toString(s3.getBGPotential().toArray()) + ";");
+		System.out.println("VInf = " + Arrays.toString(V3.toArray()) + ";");
 		for(Function psi : infWellSparsePsis){
 			System.out.println("EInf" + i + " = " + s3.getEigenvalues()[i] + ";");
 			System.out.println("PsiInf" + i + "=  " + Arrays.toString(psi.toArray()) + ";");
 			i++;
 		}
 		System.out.println("\n*****Finite Well*****");
-		System.out.println("VFin = " + Arrays.toString(s4.getBGPotential().toArray()) + ";");
+		System.out.println("VFin = " + Arrays.toString(V4.toArray()) + ";");
 		i = 0;
 		for(Function psi : finWellSparsePsis){
 			System.out.println("EFin" + i + " = " + s4.getEigenvalues()[i] + ";");

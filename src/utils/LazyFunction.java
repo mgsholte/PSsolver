@@ -18,6 +18,16 @@ public abstract class LazyFunction extends Function {
 	}
 
 	@Override
+	public Function scale(final double factor) {
+		return new LazyFunction(domain, this) {
+			@Override
+			public double evalAt(double x) {
+				return factor*evalComposedAt(x);
+			}
+		};
+	}
+
+	@Override
 	public Function add(final Function f) {
 		testDomain(f);
 		return new LazyFunction(domain, this) {
@@ -36,6 +46,17 @@ public abstract class LazyFunction extends Function {
 				return evalComposedAt(x)*evalComposedAt(x);
 			}
 		};
+	}
+
+	@Override
+	public double getNormalizingFactor() {
+		final double dx = domain.getDx();
+		double norm = 0.0, tmp;
+		for(double x : domain) {
+			tmp = evalAt(x);
+			norm += tmp*tmp*dx;
+		}
+		return 1.0/Math.sqrt(norm);
 	}
 
 }

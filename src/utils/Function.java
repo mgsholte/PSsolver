@@ -21,6 +21,11 @@ public abstract class Function {
 		return domain;
 	}
 	
+	final protected void testDomain(Function f) throws DomainMismatchException {
+		if ( !domain.equals(f.domain) )
+			throw new DomainMismatchException(domain, f.domain);
+	}
+	
 	/**
 	 * Evaluate the function at the given point
 	 * @param x
@@ -42,27 +47,23 @@ public abstract class Function {
 		return evalAt(domain.getValAtIndex(i));
 	}
 	
+	abstract public Function scale(double factor);
+	
 	abstract public Function add(Function f) throws DomainMismatchException;
 	
-	final protected void testDomain(Function f) throws DomainMismatchException {
-		if ( !domain.equals(f.domain) )
-			throw new DomainMismatchException(domain, f.domain);
-	}
+	abstract public Function square();
 	
 	/**
+	 * Scaling the function by this number will make it normalized in
+	 * the usual sense of square integrable functions.
 	 * 
-	 * @param intBnds - the bounds of integration. Step size must be an integer multiple 
-	 * 	of the fcn step size
-	 * @return the function integrated over the indicated domain
+	 * @return 1/norm({@code this})
 	 */
-	public double integrate(Domain intBnds) {
-		//TODO: implement
-		throw new UnsupportedOperationException("TODO: implement Function.integrate()");
-	}
-
-	//TODO: getNormalizingFactor() and normalize() methods need to be added
+	abstract public double getNormalizingFactor();
 	
-	abstract public Function square();
+	public Function normalize() {
+		return scale(getNormalizingFactor());
+	}
 
 	public double[] toArray() {
 		double[] ans = new double[domain.getNumPoints()];
@@ -71,5 +72,5 @@ public abstract class Function {
 			ans[i++] = evalAt(x);
 		return ans;
 	}
-	
+
 }
