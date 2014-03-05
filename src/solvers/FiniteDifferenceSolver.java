@@ -3,26 +3,13 @@ package solvers;
 /***Solves for energies and eigenstates using the finite difference method
  * 
  */
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-
-
-
-
-
-import main.Main;
 import utils.DenseMatrix;
-//import no.uib.cipr.matrix.DenseVectorSub;
-//import no.uib.cipr.matrix.SymmTridiagMatrix;
-//import no.uib.cipr.matrix.sparse.ArpackSym;
 import utils.Function;
+import utils.GreedyFunction;
 import utils.Matrix;
 import utils.RotationMatrix;
 import utils.SparseTridiag;
-import utils.GreedyFunction;
 import utils.WellParameters;
-import utils.Domain;
 
 public class FiniteDifferenceSolver extends SchrodingerSolver {
 
@@ -36,11 +23,11 @@ public class FiniteDifferenceSolver extends SchrodingerSolver {
 		eigenvalues = new double[dim];
 	}
 	
-	public int getDim(){
+	public int getDim() {
 		return dim;
 	}
 	
-	public Function getBGPotential(){
+	public Function getBGPotential() {
 		return potential;
 	}
 	
@@ -61,7 +48,7 @@ public class FiniteDifferenceSolver extends SchrodingerSolver {
 	
 	//TODO include effective mass and not just standard electron mass, change these to private
 	//Generate Hamiltonian using f''(a) = (f(a + h) - 2(f(a)) + f(a - h))/h^2
-	public double[] genHDiag(){
+	public double[] genHDiag() {
 		//hbar^2/2m = 1 / KIN_ENGY_COEFF
 		double[] diag = new double[dim];
 		for (int i = 0; i < dim; i++)
@@ -69,7 +56,7 @@ public class FiniteDifferenceSolver extends SchrodingerSolver {
 		return diag;
 	}
 	
-	public double[] genHOffDiag(){
+	public double[] genHOffDiag() {
 		double[] offDiag = new double[dim - 1];
 		for (int i = 0; i < dim - 1; i++)
 			offDiag[i] = (-1.0) / (KIN_ENGY_COEFF*delX*delX);
