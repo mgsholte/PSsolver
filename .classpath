@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/MTJ"/>
-	<classpathentry kind="lib" path="C:/Users/Matthew/Documents/Demkov Group/mtj-1.0-snapshot.jar"/>
+	<classpathentry kind="lib" path="G:/ProgrammingTools/java/custom/mtj-1.0-snapshot.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
