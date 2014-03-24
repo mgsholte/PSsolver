@@ -19,9 +19,16 @@ public class ConvergenceTester {
 	}
 	
 	public void initCycle(int numPoints) {
-		oldVals = (curVals == null) 
-					? new double[numPoints]
-					: curVals;
+		//oldVals = (curVals == null) 
+		//			? new double[numPoints]
+		//			: curVals;
+		//need to make curVals not null if neither one has already been initialized
+		if (curVals == null){
+			oldVals = new double[numPoints];
+			curVals = new double[numPoints];
+		}
+		else
+			oldVals = curVals.clone();
 		maxErr = 0;
 	}
 	
