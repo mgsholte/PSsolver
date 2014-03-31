@@ -13,8 +13,7 @@ import org.junit.Test;
 import solvers.SORSolver;
 
 /**
- * Tests the SOR solver for a few different charge distributions:  0, constant, infinite well first excited state wavefunction (squared),
- * the harmonic oscillator distribution.
+ * Tests the SOR solver for a few different charge distributions:  0, constant, infinite well first excited state wavefunction (squared)
  * All are centered about the y axis.  Going to use units where epsilon is 1
  * @author Matthew
  *
@@ -22,9 +21,9 @@ import solvers.SORSolver;
 
 public class SORTest {
 
-	private Function trivial, constant, well, harmonic;//charge distribution functions
-	private Function solT, solC, solW, solH;//known Poisson solutions to the given distributions
-	private Domain d = new Domain(-50, 50, 1000);
+	private Function trivial, constant, well;//charge distribution functions
+	private Function solT, solC, solW;//known Poisson solutions to the given distributions
+	private Domain d = new Domain(-50, 50, 2000);
 	private WellParameters params = WellParameters.genDummyParams(d);
 	
 	@Before
@@ -43,14 +42,7 @@ public class SORTest {
 				return -((Math.sqrt(2.0/L)) * Math.sin((Math.PI * x/L))*Math.sin((Math.PI * x/L)));
 			}
 		};
-		harmonic = new LazyFunction(d) {//Lifted this from FiniteDiffTest
-			//normalized GS wvfcn is f(x) = (1/pi)^(0.25)*e^(-0.5*x^2)
-			private final double coeff = -Math.pow(1.0/Math.PI, 0.25);
-			@Override
-			public double evalAt(double x) {
-				return coeff*Math.exp(-0.5*x*x);
-			}
-		};
+
 		solT = Function.getZeroFcn(d);
 		solC = new LazyFunction(d){
 			@Override
@@ -66,12 +58,7 @@ public class SORTest {
 				return cosCoeff * Math.cos(2 * Math.PI * x / L) + x2Coeff * x * x - x2Coeff * L * L - cosCoeff;
 			}
 		};
-		solH = new LazyFunction(d) {
-			@Override
-			public double evalAt(double x) {
-				return 0.5*(x*x - L*L);
-			}
-		};
+
 	}
 	
 	
@@ -80,7 +67,6 @@ public class SORTest {
 		SORSolver solverT = new SORSolver(params, trivial);
 		SORSolver solverC = new SORSolver(params, constant);
 		SORSolver solverW = new SORSolver(params, well);
-		SORSolver solverH = new SORSolver(params, harmonic);
 		Function trivialApprox = solverT.solve();
 		//assertArrayEquals(solT.toArray(), trivialApprox.toArray(), .05);
 		printMatlab(solT, "%*****Trivial*****\n\ntrivialSol = ");
@@ -96,11 +82,7 @@ public class SORTest {
 		printMatlab(solW, "%*****Well*****\n\nwellSol = ");
 		printMatlab(wellApprox, "wellApprox = ");
 		
-		
-		Function harmonicApprox = solverH.solve();
-		//assertArrayEquals(solG.toArray(), gaussianApprox.toArray(), .05);
-		printMatlab(solH, "%*****Harmonic*****\n\nharmonicSol = ");
-		printMatlab(harmonicApprox, "harmonicApprox = ");
+	
 		
 	}
 
