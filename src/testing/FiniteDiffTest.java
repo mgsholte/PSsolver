@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -82,19 +83,15 @@ public class FiniteDiffTest {
 		try {
 			FileWriter fw = new FileWriter("FiniteDiffTest.m");
 			BufferedWriter file = new BufferedWriter(fw);
-			file.write("psi0 = [");
-			for(double d : approxGndState.toArray()) {
-				file.write(Double.toString(d));
-				file.write(", ");
-			}
-			file.write("];");
+			file.write("psi0 = ");
+			file.write(Arrays.toString(approxGndState.toArray()));
 			file.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		// check eigenvects
+		// check ground state for accuracy
 		assertArrayEquals(trueGndState.toArray(), approxGndState.toArray(), 0.05);
 	}
 

@@ -31,6 +31,11 @@ public class WellParameters {
 	private WellParameters(Domain d) {
 		//TODO: for testing only
 		this.domain = d;
+		this.numLayers = 1;
+		double[] dumWidths = {d.getUB() - d.getLB()};//1 layer, width is the whole domain
+		double[] dumDielecs = {1.0};//use epsilon = 1 for testing
+		this.widths = dumWidths;
+		this.dielecs = dumDielecs;
 	}
 	
 	public WellParameters(String paramsFileName) throws ParameterReadException {
@@ -121,7 +126,7 @@ public class WellParameters {
 		return new LazyFunction(getProblemDomain()) {
 			@Override
 			public double evalAt(double x) {
-				return dielecs[getLayer(x, domain)];
+				return dielecs[getLayer(x, domain) - 1];//I changed this because it gave an ArrayIndexOutOfBounds with a 1-layer domain
 			}
 		};
 	}
