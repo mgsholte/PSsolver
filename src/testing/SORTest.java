@@ -1,29 +1,29 @@
 package testing;
 
-import static org.junit.Assert.*;
-import utils.Domain;
-import utils.Function;
-import utils.GreedyFunction;
-import utils.LazyFunction;
-import utils.WellParameters;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import solvers.SORSolver;
+import utils.Domain;
+import utils.Function;
+import utils.LazyFunction;
+import utils.WellParameters;
 
 /**
- * Tests the SOR solver for a few different charge distributions:  0, constant, infinite well first excited state wavefunction (squared)
- * All are centered about the y axis.  Going to use units where epsilon is 1
+ * Tests the SOR solver for a few different charge distributions: 0, constant,
+ * infinite well first excited state wavefunction (squared) All are centered
+ * about the y axis. Going to use units where epsilon is 1
+ * 
  * @author Matthew
- *
+ * 
  */
 
 public class SORTest {
 
-	private Function trivial, constant, well;//charge distribution functions
-	private Function solT, solC, solW;//known Poisson solutions to the given distributions
-	private Domain d = new Domain(-50, 50, 2000);
+	private Function trivial, constant, well; // charge distribution functions
+	private Function solT, solC, solW; // known Poisson solutions to the given
+										// distributions
+	private Domain d = new Domain(-50, 50, 1000);
 	private WellParameters params = WellParameters.genDummyParams(d);
 
 	@Before
@@ -39,10 +39,10 @@ public class SORTest {
 		well = new LazyFunction(d) {
 			@Override
 			public double evalAt(double x) {
-				return -((Math.sqrt(2.0/L))*Math.sin((Math.PI*x/L))*Math.sin((Math.PI*x/L)));
+				final double tmp = Math.sin(Math.PI*x/L);
+				return -Math.sqrt(2.0/L)*tmp*tmp;
 			}
 		};
-		
 		solT = Function.getZeroFcn(d);
 		solC = new LazyFunction(d) {
 			@Override
@@ -67,7 +67,7 @@ public class SORTest {
 		SORSolver solverT = new SORSolver(params, trivial);
 		SORSolver solverC = new SORSolver(params, constant);
 		SORSolver solverW = new SORSolver(params, well);
-		
+
 		System.out.println("Finding trivial solution");
 		Function trivialApprox = solverT.solve();
 		System.out.println("Solution found. Writing results");
@@ -90,15 +90,15 @@ public class SORTest {
 		// assertArrayEquals(solW.toArray(), wellApprox.toArray(), .05);
 		printMatlab(solW, "sqWellSol.m");
 		printMatlab(wellApprox, "sqWellApprox.m");
-
 	}
 
 	public static void printMatlab(Function f, String message) {
-//		Domain d = f.getDomain();
+		// Domain d = f.getDomain();
 		System.out.print(message);
 		System.out.print("[ ");
-		for (double x : f.getDomain()){
-			if(x != f.getDomain().getValAtIndex(f.getDomain().getNumPoints() - 1))
+		for (double x : f.getDomain()) {
+			if (x != f.getDomain().getValAtIndex(
+					f.getDomain().getNumPoints() - 1))
 				System.out.print(f.evalAt(x) + ", ");
 			else
 				System.out.print(f.evalAt(x));
