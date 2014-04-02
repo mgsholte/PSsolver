@@ -53,7 +53,6 @@ public final class Main {
 		Function electronPotential = Function.getZeroFcn(domain);
 		Function totalPotential;
 		ConvergenceTester convTester = new ConvergenceTester(params.getErrTolerance());
-		//TODO: set condition to break based on error tolerance
 		do {
 			// solve schrodingers eqn
 			totalPotential = electronPotential.add(params.getBgPotential());
@@ -66,7 +65,7 @@ public final class Main {
 				rho = psi.square().add(rho);
 			}
 			// update eigenvals to test for convergence
-			convTester.updateCurValues(sSolver.getEigenvalues() );
+			convTester.updateCurValues(sSolver.getEigenvalues());
 			// solve poissons eqn
 			PoissonSolver pSolver = new SORSolver(params, rho);
 			// implicitly scaled by electron charge, which is 1

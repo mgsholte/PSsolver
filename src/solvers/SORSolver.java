@@ -7,7 +7,11 @@ import utils.WellParameters;
 
 public class SORSolver extends PoissonSolver {
 	
-	protected static final double ERR_TOLERANCE = 1E-6;
+	protected static double ERR_TOLERANCE = 5E-8;
+	
+	public static void setTolerance(double tol) {
+		ERR_TOLERANCE = tol;
+	}
 
 	/** parameter controlling the successive over-relaxation mixing */
 	private final double SORParam;

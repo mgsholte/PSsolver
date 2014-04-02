@@ -60,9 +60,10 @@ public class FiniteDiffTest {
 
 	@Test
 	public void testSolveSystem() {
+		Domain d = harmonicPot.getDomain();
 		SchrodingerSolver solver = 
 				new FiniteDifferenceSolver(
-						WellParameters.genDummyParams(harmonicPot.getDomain()), 
+						WellParameters.genDummyParams(d), 
 						harmonicPot);
 
 		Function approxGndState = solver.solveSystem(5)[0];
@@ -81,8 +82,8 @@ public class FiniteDiffTest {
 		
 		// print eigvect for plotting in matlab
 		try {
-			FileWriter fw = new FileWriter("FiniteDiffTest.m");
-			BufferedWriter file = new BufferedWriter(fw);
+			BufferedWriter file = new BufferedWriter(new FileWriter("tests/FiniteDiffTest.m"));
+			file.write("% "+d.toString()+"\n");
 			file.write("psi0 = ");
 			file.write(Arrays.toString(approxGndState.toArray()));
 			file.close();
@@ -91,7 +92,7 @@ public class FiniteDiffTest {
 			e.printStackTrace();
 		}
 		
-		// check ground state for accuracy
+		// check eigenvects
 		assertArrayEquals(trueGndState.toArray(), approxGndState.toArray(), 0.05);
 	}
 
