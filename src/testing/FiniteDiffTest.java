@@ -117,10 +117,12 @@ public class FiniteDiffTest {
 		
 		// check eigenvects
 		assertArrayEquals(trueGndState.toArray(), approxGndState.toArray(), 0.05);
-	}
-	
-	@Test
-	public void examples(){
+
+		
+		
+		/**
+		 * generate example solutions
+		 */
 		Domain d1 = testWell1.getDomain();
 		Domain d2 = testWell2.getDomain();
 		SchrodingerSolver s1 = new FiniteDifferenceSolver(WellParameters.genDummyParams(d1), testWell1);
