@@ -67,7 +67,7 @@ public final class Main {
 			// update eigenvals to test for convergence
 			convTester.updateCurValues(sSolver.getEigenvalues());
 			// solve poissons eqn
-			PoissonSolver pSolver = new SORSolver(params, rho);
+			PoissonSolver pSolver = new SORSolver(params, rho, electronPotential);
 			// implicitly scaled by electron charge, which is 1
 			electronPotential = pSolver.solve();
 		} while (!convTester.hasConverged());

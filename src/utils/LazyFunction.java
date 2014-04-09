@@ -59,4 +59,9 @@ public abstract class LazyFunction extends Function {
 		return 1.0/Math.sqrt(norm);
 	}
 
+	@Override
+	public Function offset(){
+		double[] newVals = this.toArray();
+		return new GreedyFunction(domain, newVals).offset();
+	}
 }

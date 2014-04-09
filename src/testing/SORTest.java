@@ -78,9 +78,9 @@ public class SORTest {
 
 		// setup solvers
 		SORSolver.setTolerance(5E-7);
-		SORSolver solverT = new SORSolver(params, trivial);
-		SORSolver solverC = new SORSolver(params, constant);
-		SORSolver solverW = new SORSolver(params, well);
+		SORSolver solverT = new SORSolver(params, trivial, Function.getZeroFcn(d));
+		SORSolver solverC = new SORSolver(params, constant,Function.getZeroFcn(d));
+		SORSolver solverW = new SORSolver(params, well,Function.getZeroFcn(d));
 
 		// find solutions and print to files for matlab import
 		System.out.println("finding trivial soln");

@@ -73,4 +73,6 @@ public abstract class Function {
 		return ans;
 	}
 
+	abstract public Function offset();
+
 }

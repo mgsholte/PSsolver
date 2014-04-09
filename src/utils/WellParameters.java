@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+import main.Main;
+
 public class WellParameters {
 	
 	public static final String defaultParamsFileName = "./well_params_default.kvp";
@@ -36,6 +38,7 @@ public class WellParameters {
 		double[] dumDielecs = {1.0};//use epsilon = 1 for testing
 		this.widths = dumWidths;
 		this.dielecs = dumDielecs;
+		errTol = Main.DEFAULT_TOLERANCE;
 	}
 	
 	public WellParameters(String paramsFileName) throws ParameterReadException {

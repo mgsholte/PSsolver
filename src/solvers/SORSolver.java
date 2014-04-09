@@ -8,6 +8,7 @@ import utils.WellParameters;
 public class SORSolver extends PoissonSolver {
 	
 	protected static double ERR_TOLERANCE = 5E-8;
+	protected Function initGuess;
 	
 	public static void setTolerance(double tol) {
 		ERR_TOLERANCE = tol;
@@ -16,9 +17,10 @@ public class SORSolver extends PoissonSolver {
 	/** parameter controlling the successive over-relaxation mixing */
 	private final double SORParam;
 
-	public SORSolver(WellParameters params, Function chgDensity) {
+	public SORSolver(WellParameters params, Function chgDensity, Function initGuess) {
 		super(params, chgDensity);
 		SORParam = 2.0/(1.0 + Math.sin(Math.PI*params.getProblemDomain().getDx()));
+		this.initGuess = initGuess;
 	}
 
 	/**
@@ -34,7 +36,7 @@ public class SORSolver extends PoissonSolver {
 		final int n = potential.getDomain().getNumPoints();
 		// use zero-everywhere as initial guess for the electric potential.
 		// this has the bonus of correctly initializing the bdry conds
-		double[] soln = new double[n];
+		double[] soln = initGuess.toArray();
 		ConvergenceTester tester = new ConvergenceTester(ERR_TOLERANCE);
 		do {
 			tester.initCycle(n);

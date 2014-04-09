@@ -48,9 +48,8 @@ public class GreedyFunction extends Function {
 	public Function add(Function f) {
 		testDomain(f);
 		double[] sum = new double[vals.length];
-		int i = 0;
-		for(double x : domain) {
-			sum[i] = vals[i++] + f.evalAt(x);
+		for(int i = 0; i < vals.length; i++) {
+			sum[i] = vals[i] + f.evalAtIdx(i);
 		}
 		return new GreedyFunction(domain, sum);
 	}
@@ -98,7 +97,22 @@ public class GreedyFunction extends Function {
 
 	@Override
 	public double[] toArray() {
-		return vals;
+		return vals.clone();
+	}
+	
+	//This takes the function and translates it so that its minimum value is 0 - used to reset the potential function
+	//assumes the function is >= 0 for its whole domain
+	@Override
+	public Function offset(){
+		double min = vals[0];
+		for(int i = 0; i < vals.length; i++){
+			if (this.evalAtIdx(i) < min)
+				min = this.evalAtIdx(i);
+		}
+		double[] newVals = new double[vals.length];
+		for(int i = 0; i < vals.length; i++)
+			newVals[i] = vals[i] - min;
+		return new GreedyFunction(domain, newVals);
 	}
 
 }
