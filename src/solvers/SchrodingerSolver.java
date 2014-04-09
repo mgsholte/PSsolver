@@ -6,8 +6,7 @@ import utils.WellParameters;
 
 public abstract class SchrodingerSolver extends ODESolver {
 
-	//TODO: for testing purposes only. find true value for release
-	private static final double HBAR_SQ_2_M = 1.0/2.0; // hbar^2/(2*m_e) in units of ev/A^2
+	private static final double HBAR_SQ_2_M = 1.0/2.0; // hbar^2/(2*m_e) in units of ev*A^2 **APPROXIMATE TRUE VALUE** = 3.806
 	
 	protected final double kinEngyCoeff;
 	

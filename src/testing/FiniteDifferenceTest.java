@@ -1,5 +1,6 @@
 package testing;
 
+import java.io.File;
 import java.util.Arrays;
 
 import org.junit.Before;
@@ -22,15 +23,15 @@ public class FiniteDifferenceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		d1 = new Domain(-5.0, 5.0, 50); //toy example
+		d1 = new Domain(-250.0, 250.0, 1292); //Maximum number of points that will give a convergent result
 		p1 = WellParameters.genDummyParams(d1); //toy example
 		V1 = Function.getZeroFcn(d1); //infinite well
 		V2 = new LazyFunction(d1){ //finite well
 			public double evalAt(double x) {
-				if (x >= -1.0 && x <= 1.0)
-					return 0.0;
+				if (x >= -50.0 && x <= 50.0)
+					return 0;
 				else
-					return 5.0;
+					return 1;
 			}
 		};
 		s1 = new FiniteDifferenceSolver(p1, V1);
@@ -45,24 +46,14 @@ public class FiniteDifferenceTest {
 	
 	@Test
 	public void testSolveSystem(){
-		Function[] infWellSparsePsis = s1.solveSystem(5);
+		//Function[] infWellSparsePsis = s1.solveSystem(5);
 		Function[] finWellSparsePsis = s2.solveSystem(5);
-		int i = 0;
-		System.out.println("*****Infinite Well*****");
-		System.out.println("VInf = " + Arrays.toString(V1.toArray()) + ";");
-		for(Function psi : infWellSparsePsis){
-			System.out.println("EInf" + i + " = " + s1.getEigenvalues()[i] + ";");
-			System.out.println("PsiInf" + i + "=  " + Arrays.toString(psi.toArray()) + ";");
-			i++;
+		new File("FiniteDifferenceTest.m").delete();
+		for(int i = 0; i < finWellSparsePsis.length; i ++){
+			SORTest.printMatlab(finWellSparsePsis[i], "Psi" + i + " = ", "FiniteDifferenceTest.m");
 		}
-		System.out.println("\n*****Finite Well*****");
-		System.out.println("VFin = " + Arrays.toString(V2.toArray()) + ";");
-		i = 0;
-		for(Function psi : finWellSparsePsis){
-			System.out.println("EFin" + i + " = " + s2.getEigenvalues()[i] + ";");
-			System.out.println("PsiFin" + i + "=  " + Arrays.toString(psi.toArray()) + ";");
-			i++;
-		}
+		System.out.println(Arrays.toString(s2.getEigenvalues()));
+
 	}
 
 }

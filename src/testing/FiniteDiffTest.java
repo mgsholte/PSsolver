@@ -33,7 +33,7 @@ public class FiniteDiffTest {
 	@Before
 	public void setUp() throws Exception {
 		//init known solution
-		Domain d = new Domain(-50, 50, 1000); //TODO: test on larger domain
+		Domain d = new Domain(-50, 50, 1500); //TODO: test on larger domain
 		Domain d1 = new Domain(-250, 250, 5000);
 		trueGndState = new LazyFunction(d) {
 			//normalized GS wvfcn is f(x) = (1/pi)^(0.25)*e^(-0.5*x^2)
@@ -64,9 +64,9 @@ public class FiniteDiffTest {
 		testWell1 = new LazyFunction(d){
 			@Override
 			public double evalAt(double x){
-				if (x < 20.0 && x > -20.0)
+				if (x < 10.0 && x > -10.0)
 					return 0.0;
-				else return 2.0;
+				else return 1.0;
 			}
 		};
 		
@@ -89,7 +89,9 @@ public class FiniteDiffTest {
 						WellParameters.genDummyParams(d), 
 						harmonicPot);
 
+		System.out.println("Harmonic Oscillator test solving");
 		Function approxGndState = solver.solveSystem(5)[0];
+		System.out.println("Harmonic Oscillator test found");
 		// solution comes out normalized, but might be upside down.
 		// check by looking at a point right before the middle of the well
 		if( approxGndState.evalAtIdx(harmonicPot.getDomain().getNumPoints()/2 - 1) < 0.0 ) {
@@ -100,7 +102,7 @@ public class FiniteDiffTest {
 		// check eigenvalues
 		double[] eigvals = solver.getEigenvalues();
 		for(int i = 0; i < 5; ++i) {
-			assertEquals(0.5+i, eigvals[i], 0.05);
+			assertEquals(.5+i, eigvals[i], 0.05);
 		}
 		
 		// print eigvect for plotting in matlab
