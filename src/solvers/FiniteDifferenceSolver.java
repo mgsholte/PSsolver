@@ -30,10 +30,10 @@ public class FiniteDifferenceSolver extends SchrodingerSolver {
 		// initialize diag and subDiag
 		for(int i = 0; i < N-1; ++i) {
 			// diag elems == 2*K_E_C + potential at that point
-			diag[i] += 2*kinEngyCoeff;
-			offDiag[i] = -kinEngyCoeff;
+			diag[i] += 2*kinEngyCoeff/params.getMass().evalAtIdx(i);
+			offDiag[i] = -kinEngyCoeff/params.getMass().evalAtIdx(i);
 		}
-		diag[N-1] += 2*kinEngyCoeff; // diag has 1 more element than offDiag
+		diag[N-1] += 2*kinEngyCoeff/params.getMass().evalAtIdx(N - 1); // diag has 1 more element than offDiag
 		
 		// solve for the specified number of smallest eigenpairs
 		Map<Double, DenseVectorSub> eigenpairs =
