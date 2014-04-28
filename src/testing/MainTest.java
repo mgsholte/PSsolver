@@ -26,7 +26,7 @@ public class MainTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		domain = new Domain(-250.0, 250.0, 5000);
+		domain = new Domain(-250.0, 250.0, 1000);
 		bgPotential = new LazyFunction(domain){
 			@Override
 			public double evalAt(double x){
@@ -64,9 +64,7 @@ public class MainTest {
 				electronPotential = new LazyFunction(domain){
 					@Override
 					public double evalAt(double x) {
-						return (x < -50 || x > 50) ?
-								0.0 :
-								.5 * curv * x * x - params.getDofZ();
+						return .5 * curv * x * x - params.getDofZ();
 					};
 				};
 				electronPotential.offset();
