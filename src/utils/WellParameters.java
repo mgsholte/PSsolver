@@ -16,10 +16,10 @@ public class WellParameters {
 	public int numLayers;
 	
 	private double
-		dx, errTol;
+		dx, errTol, Lx, Ly, Lz, dOfZ;//dOfZ in A^-3 ~ 2e-6
 	
 	private double[]
-		widths, bandGaps, dielecs, effMasses;
+		widths, bandGaps, dielecs, effMasses;//effMasses need to be relative to rest mass
 	
 	private Domain domain;
 	
@@ -38,7 +38,12 @@ public class WellParameters {
 		double[] dumDielecs = {1.0};//use epsilon = 1 for testing
 		this.widths = dumWidths;
 		this.dielecs = dumDielecs;
+		this.effMasses = dumDielecs.clone();
 		errTol = Main.DEFAULT_TOLERANCE;
+		Lz = d.getUB() - d.getLB();
+		Lx = 1e8;
+		Ly = 1e8;
+		dOfZ = 2e-6;
 	}
 	
 	public WellParameters(String paramsFileName) throws ParameterReadException {
@@ -77,6 +82,22 @@ public class WellParameters {
 		errTol = Double.parseDouble( params.getProperty("tolerance") );
 	}
 	
+	public double getDofZ(){
+		return dOfZ;
+	}
+	
+	public double getLx(){
+		return Lx;
+	}
+	
+	public double getLy(){
+		return Ly;
+	}
+	
+	public double getLz(){
+		return Lz;
+	}
+	
 	public double getErrTolerance() {
 		return errTol;
 	}
@@ -108,12 +129,12 @@ public class WellParameters {
 		// find which layer x is in.
 		// as long as x is to the right, move to the next layer edge
 		int layer = 0;
-		while (x > rightEdge) {
+		while (x > rightEdge || rightEdge == domain.getLB()) {
 			if (layer >= numLayers)
 				throw new IllegalArgumentException("x is not in the mass fcn domain");
 			rightEdge += widths[layer++];
 		}
-		return layer;
+		return layer - 1;
 	}
 	
 	public Function getMass() {
@@ -129,14 +150,20 @@ public class WellParameters {
 		return new LazyFunction(getProblemDomain()) {
 			@Override
 			public double evalAt(double x) {
-				return dielecs[getLayer(x, domain) - 1];//I changed this because it gave an ArrayIndexOutOfBounds with a 1-layer domain
+				return dielecs[getLayer(x, domain)];
 			}
 		};
 	}
 
 	public Function getBgPotential() {
-		// TODO Auto-generated method stub
-		return null;
+		final double[] bGPVals = bandGaps.clone();
+		LazyFunction bGPTemp = new LazyFunction(domain){
+			@Override
+			public double evalAt(double x){
+				return bGPVals[getLayer(x, domain)];
+			};
+		};
+		return bGPTemp.offset();
 	}
 	
 }

@@ -74,5 +74,22 @@ public abstract class Function {
 	}
 
 	abstract public Function offset();
+	
+	public Function divide(Function f){
+		double[] vals = new double[domain.getNumPoints()];
+		for(int i = 0; i < vals.length; i++){
+			vals[i] = this.evalAtIdx(i)/f.evalAtIdx(i);
+		}
+		return new GreedyFunction(domain, vals);
+	}
+	
+	public Function multiply(Function f){
+		double[] vals = new double[domain.getNumPoints()];
+		for(int i = 0; i < vals.length; i++){
+			vals[i] = this.evalAtIdx(i)*f.evalAtIdx(i);
+		}
+		return new GreedyFunction(domain, vals);
+	}
+
 
 }

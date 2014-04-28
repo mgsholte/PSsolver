@@ -7,7 +7,7 @@ import utils.WellParameters;
 
 public class SORSolver extends PoissonSolver {
 	
-	protected static double ERR_TOLERANCE = 5E-8;
+	protected static double ERR_TOLERANCE = 1E-8;
 	protected Function initGuess;
 	
 	public static void setTolerance(double tol) {
