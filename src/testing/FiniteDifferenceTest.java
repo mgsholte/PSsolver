@@ -23,7 +23,7 @@ public class FiniteDifferenceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		d1 = new Domain(-250.0, 250.0, 1292); //Maximum number of points that will give a convergent result
+		d1 = new Domain(-250.0, 250.0, 5000); //Maximum number of points that will give a convergent result
 		p1 = WellParameters.genDummyParams(d1); //toy example
 		//V1 = Function.getZeroFcn(d1); //infinite well
 		V2 = new LazyFunction(d1){ //finite well
@@ -31,7 +31,7 @@ public class FiniteDifferenceTest {
 				if (x >= -50.0 && x <= 50.0)
 					return 0;
 				else
-					return 0;
+					return 5;
 			}
 		};
 		//s1 = new FiniteDifferenceSolver(p1, V1);
@@ -47,7 +47,7 @@ public class FiniteDifferenceTest {
 	@Test
 	public void testSolveSystem(){
 		//Function[] infWellSparsePsis = s1.solveSystem(5);
-		Function[] finWellSparsePsis = s2.solveSystem(15);
+		Function[] finWellSparsePsis = s2.solveSystem(35);
 		new File("FiniteDifferenceTest.m").delete();
 		for(int i = 0; i < finWellSparsePsis.length; i ++){
 			SORTest.printMatlab(finWellSparsePsis[i], "Psi" + i + " = ", "FiniteDifferenceTest.m");

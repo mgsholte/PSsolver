@@ -52,7 +52,7 @@ public class MainTest {
 			// solve schrodingers eqn
 			totalPotential = electronPotential.add(bgPotential);
 			SchrodingerSolver sSolver = new FiniteDifferenceSolver(params, totalPotential);
-			psis = sSolver.solveSystem(35); // TODO: decide how many states to find
+			psis = sSolver.solveSystem(15); // TODO: decide how many states to find
 			// get areal chg density
 			//TODO: take into account N_i
 			double[] nPerE = fillEnergies(sSolver.getEigenvalues());
@@ -114,7 +114,7 @@ public class MainTest {
 			Function temp = psis[i].square().scale(nPerE[i]);
 			psiSum = psiSum.add(temp);
 		}
-//		psiSum = psiSum.scale(1/(params.getLx()*params.getLy()));
+		psiSum = psiSum.scale(1/(params.getLx()*params.getLy()));//scale psi to correspond to a volume density
 		for (int i = 0; i < rhoVals.length; i++){
 			rhoVals[i] =   psiSum.evalAtIdx(i) - params.getDofZ().evalAtIdx(i);
 		}
