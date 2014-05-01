@@ -90,6 +90,15 @@ public abstract class Function {
 		}
 		return new GreedyFunction(domain, vals);
 	}
+	
+	public double integrate(double lb, double ub){
+		if (!domain.contains(lb) || !domain.contains(ub))
+			throw new IllegalArgumentException("Cannot integrate on the given interval - bound(s) outside domain");
+		double result = 0;
+		for(int i = domain.getIndexOf(lb); i < domain.getIndexOf(ub); i++)
+			result += evalAtIdx(i) * domain.getDx();
+		return result;
+	}
 
 
 }
