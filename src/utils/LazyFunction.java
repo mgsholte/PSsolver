@@ -26,7 +26,17 @@ public abstract class LazyFunction extends Function {
 			}
 		};
 	}
-
+	
+	@Override
+	public Function negate() {
+		return new LazyFunction(domain, this) {
+			@Override
+			public double evalAt(double x) {
+				return -evalComposedAt(x);
+			}
+		};
+	}
+		
 	@Override
 	public Function add(final Function f) {
 		testDomain(f);

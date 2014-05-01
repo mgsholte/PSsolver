@@ -49,6 +49,8 @@ public abstract class Function {
 	
 	abstract public Function scale(double factor);
 	
+	abstract public Function negate();
+	
 	abstract public Function add(Function f) throws DomainMismatchException;
 	
 	abstract public Function square();

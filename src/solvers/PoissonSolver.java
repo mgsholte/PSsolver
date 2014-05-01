@@ -6,7 +6,7 @@ import utils.WellParameters;
 abstract public class PoissonSolver extends ODESolver {
 
 	public PoissonSolver(WellParameters params, Function chgDensity) {
-		super(params, chgDensity);
+		super(params, chgDensity.negate());
 	}
 
 	/**
@@ -15,7 +15,7 @@ abstract public class PoissonSolver extends ODESolver {
 	 * @return the same as {@code solve(1.0)}
 	 */
 	public Function solve() {
-		return solve(1.0);
+		return solve(Double.NaN);
 	}
 
 }

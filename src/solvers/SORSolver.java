@@ -1,13 +1,16 @@
 package solvers;
 
+import java.util.Random;
+
 import utils.ConvergenceTester;
+import utils.Domain;
 import utils.Function;
 import utils.GreedyFunction;
 import utils.WellParameters;
 
 public class SORSolver extends PoissonSolver {
 	
-	protected static double ERR_TOLERANCE = 5E-7;
+	protected static double ERR_TOLERANCE = 1E-7;
 	protected Function initGuess;
 	
 	public static void setTolerance(double tol) {
@@ -21,6 +24,19 @@ public class SORSolver extends PoissonSolver {
 		super(params, chgDensity);
 		SORParam = 2.0/(1.0 + Math.sin(Math.PI*params.getProblemDomain().getDx()));
 		this.initGuess = initGuess;
+	}
+	
+	public SORSolver(WellParameters params, Function chgDensity) {
+		this(params, chgDensity, genRandFcn(chgDensity.getDomain()));
+	}
+
+	private static Function genRandFcn(Domain domain) {
+		double[] vals = new double[domain.getNumPoints()];
+		Random rng = new Random();
+		for(int i = 0; i < vals.length; ++i) {
+			vals[i] = rng.nextDouble();
+		}
+		return new GreedyFunction(domain, vals);
 	}
 
 	/**

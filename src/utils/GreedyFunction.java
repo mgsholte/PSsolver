@@ -115,4 +115,13 @@ public class GreedyFunction extends Function {
 		return new GreedyFunction(domain, newVals);
 	}
 
+	@Override
+	public Function negate() {
+		double[] negVals = new double[vals.length];
+		for (int i = 0; i < vals.length; ++i) {
+			negVals[i] = -vals[i];
+		}
+		return new GreedyFunction(domain, negVals);
+	}
+
 }

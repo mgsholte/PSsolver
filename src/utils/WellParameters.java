@@ -32,15 +32,16 @@ public class WellParameters {
 	 */
 	private WellParameters(Domain d) {
 		//TODO: for testing only
+		double totWidth = d.getUB() - d.getLB();
 		this.domain = d;
-		this.numLayers = 1;
-		double[] dumWidths = {d.getUB() - d.getLB()};//1 layer, width is the whole domain
-		double[] dumDielecs = {1.0};//use epsilon = 1 for testing
+		this.numLayers = 3;
+		double[] dumWidths = { totWidth/5*2, totWidth/5, totWidth/5*2};//1 layer, width is the whole domain
+		double[] dumDielecs = {1.0, 1.0, 1.0};//use epsilon = 1 for testing
 		this.widths = dumWidths;
 		this.dielecs = dumDielecs;
 		this.effMasses = dumDielecs.clone();
 		errTol = Main.DEFAULT_TOLERANCE;
-		Lz = d.getUB() - d.getLB();
+		Lz = totWidth;
 		Lx = 1e8;
 		Ly = 1e8;
 		dOfZ = 2e-6;
@@ -82,8 +83,15 @@ public class WellParameters {
 		errTol = Double.parseDouble( params.getProperty("tolerance") );
 	}
 	
-	public double getDofZ(){
-		return dOfZ;
+	public Function getDofZ(){
+		return new LazyFunction(getProblemDomain()) {
+			@Override
+			public double evalAt(double x) {
+				return getLayer(x, this.domain) == 1 ?
+						dOfZ :
+						0;
+			}
+		};
 	}
 	
 	public double getLx(){
@@ -100,6 +108,10 @@ public class WellParameters {
 	
 	public double getErrTolerance() {
 		return errTol;
+	}
+	
+	public double[] getWidths() {
+		return widths;
 	}
 
 	public Domain getProblemDomain() {
