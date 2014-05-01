@@ -158,10 +158,10 @@ public class WellParameters {
 	public Function getBgPotential() {
 		final double[] bGPVals = bandGaps.clone();
 		LazyFunction bGPTemp = new LazyFunction(domain){
-									@Override
-									public double evalAt(double x){
-										return bGPVals[getLayer(x, domain)];
-									};
+			@Override
+			public double evalAt(double x){
+				return bGPVals[getLayer(x, domain)];
+			};
 		};
 		return bGPTemp.offset();
 	}
