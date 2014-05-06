@@ -1,5 +1,7 @@
 package utils;
 
+import java.util.Random;
+
 public abstract class Function {
 	
 	public static final Function getZeroFcn(Domain domain) {
@@ -7,6 +9,16 @@ public abstract class Function {
 			@Override
 			public double evalAt(double x) {
 				return 0;
+			}
+		};
+	}
+	
+	public static final Function getRandFcn(Domain domain, final double scale) {
+		return new LazyFunction(domain) {
+			Random rng = new Random();
+			@Override
+			public double evalAt(double x) {
+				return rng.nextDouble()*scale;
 			}
 		};
 	}

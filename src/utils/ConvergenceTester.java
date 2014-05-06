@@ -23,7 +23,7 @@ public class ConvergenceTester {
 		//			? new double[numPoints]
 		//			: curVals;
 		//need to make curVals not null if neither one has already been initialized
-		if (curVals == null){
+		if (curVals == null) {
 			oldVals = new double[numPoints];
 			curVals = new double[numPoints];
 		}
@@ -62,7 +62,7 @@ public class ConvergenceTester {
 	}
 
 	private void calcErrAtIdx(int i) {
-		err = (curVals[i] - oldVals[i])/curVals[i];
+		err = Math.abs((curVals[i] - oldVals[i])/curVals[i]);
 		maxErr = (err > maxErr)
 				? err 
 				: maxErr;
