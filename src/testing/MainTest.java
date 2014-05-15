@@ -26,7 +26,7 @@ public class MainTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		domain = new Domain(-250.0, 250.0, 1000);
+		domain = new Domain(-250.0, 250.0, 1500);
 		bgPotential = new LazyFunction(domain) {
 			@Override
 			public double evalAt(double x) {
@@ -37,7 +37,7 @@ public class MainTest {
 			};
 		};
 		params = WellParameters.genDummyParams(domain);
-		SORSolver.setTolerance(1E-6);
+		SORSolver.setTolerance(1E-7);
 	}
 
 	@Test
@@ -52,7 +52,7 @@ public class MainTest {
 			// solve schrodingers eqn
 			totalPotential = electronPotential.add(bgPotential);
 			SchrodingerSolver sSolver = new FiniteDifferenceSolver(params, totalPotential);
-			psis = sSolver.solveSystem(15); // TODO: decide how many states to find
+			psis = sSolver.solveSystem(35); // TODO: decide how many states to find
 			// get areal chg density
 			//TODO: take into account N_i
 			double[] nPerE = fillEnergies(sSolver.getEigenvalues());
@@ -62,16 +62,17 @@ public class MainTest {
 			// solve poissons eqn
 			if(iters == 0) {
 				final double curv = 0.5*rho.evalAt(0)/params.getDielectric().evalAt(0);
-				electronPotential = new LazyFunction(domain) {
+//				electronPotential = new LazyFunction(domain) {
 					final double L2 = params.getWidths()[1]/2;
-					@Override
-					public double evalAt(double x) {
-						return (x > -50 && x < 50) ?
-								curv*(x - L2)*(x + L2) - params.getDofZ().evalAt(x)*L2 :
-								0;
-					};
-				};
-				SORTest.printMatlab(electronPotential, "initGuess =", "initGuess.m");
+//					@Override
+//					public double evalAt(double x) {
+//						return (x > -50 && x < 50) ?
+//								curv*(x - L2)*(x + L2) - params.getDofZ().evalAt(x)*L2 :
+//								0;
+//					};
+//				};
+				electronPotential = Function.getRandFcn(domain, (curv*L2-params.getDofZ().evalAt(0))*L2);
+				SORTest.printMatlab(electronPotential, "initGuess =", "initGuessOut.m");
 //				electronPotential.offset();
 			}
 			PoissonSolver pSolver = new SORSolver(params, rho, electronPotential.negate());
@@ -101,9 +102,8 @@ public class MainTest {
 	//convenience for testing - will have to fix this for the real version
 	public double[] fillEnergies(double[] energies){
 		double[] nPerE = new double[energies.length];
-		nPerE[0] = (params.getDofZ().evalAt(0) * params.getLz()/5);
-//		nPerE[0] = (params.getDofZ().evalAt(0) * params.getLz()/5)/2;
-//		nPerE[1] = (params.getDofZ().evalAt(0) * params.getLz()/5)/2;
+		nPerE[0] = (params.getDofZ().evalAt(0) * params.getLz()/5)/2;
+		nPerE[1] = (params.getDofZ().evalAt(0) * params.getLz()/5)/2;
 		return nPerE;
 	}
 	
@@ -115,8 +115,16 @@ public class MainTest {
 			Function temp = psis[i].square().scale(nPerE[i]);
 			psiSum = psiSum.add(temp);
 		}
+<<<<<<< HEAD
+=======
+		//psiSum = psiSum.scale(1/(params.getLx()*params.getLy()));//scale psi to correspond to a volume density
+>>>>>>> refs/remotes/origin/master
 		for (int i = 0; i < rhoVals.length; i++){
+<<<<<<< HEAD
 			rhoVals[i] = params.getDofZ().evalAtIdx(i) - psiSum.evalAtIdx(i);
+=======
+			rhoVals[i] =   params.getDofZ().evalAtIdx(i) - psiSum.evalAtIdx(i);
+>>>>>>> refs/remotes/origin/master
 		}
 		return new GreedyFunction(domain, rhoVals);
 	}

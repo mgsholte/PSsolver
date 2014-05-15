@@ -36,7 +36,7 @@ public class WellParameters {
 		this.domain = d;
 		this.numLayers = 3;
 		double[] dumWidths = { totWidth/5*2, totWidth/5, totWidth/5*2};//1 layer, width is the whole domain
-		double[] dumDielecs = {1.0, 1.0, 1.0};//use epsilon = 1 for testing
+		double[] dumDielecs = {12.0, 10.0, 12.0};
 		this.widths = dumWidths;
 		this.dielecs = dumDielecs;
 		this.effMasses = dumDielecs.clone();
@@ -160,9 +160,10 @@ public class WellParameters {
 	
 	public Function getDielectric() {
 		return new LazyFunction(getProblemDomain()) {
+			private static final double eps0 = 0.00552635;
 			@Override
 			public double evalAt(double x) {
-				return dielecs[getLayer(x, domain)];
+				return dielecs[getLayer(x, domain)]*eps0;
 			}
 		};
 	}

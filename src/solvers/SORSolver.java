@@ -27,16 +27,7 @@ public class SORSolver extends PoissonSolver {
 	}
 	
 	public SORSolver(WellParameters params, Function chgDensity) {
-		this(params, chgDensity, genRandFcn(chgDensity.getDomain()));
-	}
-
-	private static Function genRandFcn(Domain domain) {
-		double[] vals = new double[domain.getNumPoints()];
-		Random rng = new Random();
-		for(int i = 0; i < vals.length; ++i) {
-			vals[i] = rng.nextDouble();
-		}
-		return new GreedyFunction(domain, vals);
+		this(params, chgDensity, Function.getRandFcn(chgDensity.getDomain(), 1.0));
 	}
 
 	/**
@@ -53,6 +44,7 @@ public class SORSolver extends PoissonSolver {
 		// use zero-everywhere as initial guess for the electric potential.
 		// this has the bonus of correctly initializing the bdry conds
 		double[] soln = initGuess.toArray();
+		soln[0] = soln[n - 1] = 0;
 		ConvergenceTester tester = new ConvergenceTester(ERR_TOLERANCE);
 		do {
 			tester.initCycle(n);
@@ -83,7 +75,8 @@ public class SORSolver extends PoissonSolver {
 	private double stencil(int i, double[] vals) {
 		final double dx = potential.getDomain().getDx(), x = potential.getDomain().getValAtIndex(i), 
 				RHS = potential.evalAt(x)/params.getDielectric().evalAt(x);
-		vals[i] = (1-SORParam)*vals[i] + SORParam*0.5*(vals[i-1] + vals[i+1] + dx*dx*RHS);
+		//TODO: is this right? Fink & Mathews seems to confirm it is
+		vals[i] = (1-SORParam)*vals[i] + SORParam*(vals[i-1] + vals[i+1] + dx*dx*RHS)/2;
 		return vals[i];
 	}
 
