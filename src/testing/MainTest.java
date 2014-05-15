@@ -115,16 +115,8 @@ public class MainTest {
 			Function temp = psis[i].square().scale(nPerE[i]);
 			psiSum = psiSum.add(temp);
 		}
-<<<<<<< HEAD
-=======
-		//psiSum = psiSum.scale(1/(params.getLx()*params.getLy()));//scale psi to correspond to a volume density
->>>>>>> refs/remotes/origin/master
 		for (int i = 0; i < rhoVals.length; i++){
-<<<<<<< HEAD
 			rhoVals[i] = params.getDofZ().evalAtIdx(i) - psiSum.evalAtIdx(i);
-=======
-			rhoVals[i] =   params.getDofZ().evalAtIdx(i) - psiSum.evalAtIdx(i);
->>>>>>> refs/remotes/origin/master
 		}
 		return new GreedyFunction(domain, rhoVals);
 	}
