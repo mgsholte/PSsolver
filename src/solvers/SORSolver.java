@@ -81,11 +81,9 @@ public class SORSolver extends PoissonSolver {
 	 * @return the updated value
 	 */
 	private double stencil(int i, double[] vals) {
-		//TODO: missing a negative sign on RHS? or is it taken into account by making q_e positive?
 		final double dx = potential.getDomain().getDx(), x = potential.getDomain().getValAtIndex(i), 
 				RHS = potential.evalAt(x)/params.getDielectric().evalAt(x);
-		//TODO: is this right? Fink & Mathews seems to confirm it is
-		vals[i] = (1-SORParam)*vals[i] + SORParam*(vals[i-1] + vals[i+1] + dx*dx*RHS)/2;
+		vals[i] = (1-SORParam)*vals[i] + SORParam*0.5*(vals[i-1] + vals[i+1] + dx*dx*RHS);
 		return vals[i];
 	}
 
