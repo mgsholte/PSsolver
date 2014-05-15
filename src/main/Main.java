@@ -25,7 +25,7 @@ public final class Main {
 		MAJOR_VER_NUM = 0,
 		MINOR_VER_NUM = 1;
 	
-	public static final double DEFAULT_TOLERANCE = 1E-6;
+	public static final double DEFAULT_TOLERANCE = 1E-5;
 
 	public static void main(String[] args) {
 		// ensure that there is at least one input file

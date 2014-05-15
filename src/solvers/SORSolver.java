@@ -1,9 +1,6 @@
 package solvers;
 
-import java.util.Random;
-
 import utils.ConvergenceTester;
-import utils.Domain;
 import utils.Function;
 import utils.GreedyFunction;
 import utils.WellParameters;
@@ -53,7 +50,9 @@ public class SORSolver extends PoissonSolver {
 			for(int i = 1; i < n/2; ++i) {
 				tester.updateValAtIdx(stencil(i, soln), i);
 				j = n-i-1;
-				tester.updateValAtIdx(stencil(j, soln), j);
+				soln[j] = soln[i];
+				//test to see if we can settle with just solving half of a symmetric problem
+				tester.updateValAtIdx(soln[j], j);//tester.updateValAtIdx(stencil(j, soln), j);
 			}
 			// if n is odd then we still need to update the middle point
 			if ((n & 1) == 1) {

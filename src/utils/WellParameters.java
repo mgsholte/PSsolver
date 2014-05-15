@@ -37,9 +37,10 @@ public class WellParameters {
 		this.numLayers = 3;
 		double[] dumWidths = { totWidth/5*2, totWidth/5, totWidth/5*2};//1 layer, width is the whole domain
 		double[] dumDielecs = {12.0, 10.0, 12.0};
+		double[] dumMasses = {1, 1, 1};
 		this.widths = dumWidths;
 		this.dielecs = dumDielecs;
-		this.effMasses = dumDielecs.clone();
+		this.effMasses = dumMasses;
 		errTol = Main.DEFAULT_TOLERANCE;
 		Lz = totWidth;
 		Lx = 1e8;
