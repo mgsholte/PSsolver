@@ -45,6 +45,8 @@ public class SORSolver extends PoissonSolver {
 		double[] soln = initGuess.toArray();
 		soln[0] = soln[n - 1] = 0;
 		ConvergenceTester tester = new ConvergenceTester(ERR_TOLERANCE);
+		final double dx = potential.getDomain().getDx();
+		double x, RHS, newval;
 		do {
 			tester.initCycle(n);
 			// note: don't update end-points since they are fixed bdry conds
@@ -67,7 +69,12 @@ public class SORSolver extends PoissonSolver {
 //				tester.updateValAtIdx(stencil(j, soln), j);
 //			}
 			for(int i = 1; i < n-1; ++i) {
-				tester.updateValAtIdx(stencil(i,soln), i);
+				x = potential.getDomain().getValAtIndex(i);
+				RHS = potential.evalAt(x)/(params.getDielectric().evalAt(x));
+				newval = (1-SORParam)*soln[i] + SORParam*(soln[i-1] + soln[i+1] + dx*dx*RHS)/2; 
+				soln[i] = newval;
+				tester.updateValAtIdx(newval, i);
+//				tester.updateValAtIdx(stencil(i,soln), i);
 			}
 		} while(!tester.hasConverged());
 		
