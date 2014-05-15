@@ -1,9 +1,6 @@
 package solvers;
 
-import java.util.Random;
-
 import utils.ConvergenceTester;
-import utils.Domain;
 import utils.Function;
 import utils.GreedyFunction;
 import utils.WellParameters;
@@ -12,6 +9,8 @@ public class SORSolver extends PoissonSolver {
 	
 	protected static double ERR_TOLERANCE = 1E-7;
 	protected Function initGuess;
+	
+	public static double getTolerance() { return ERR_TOLERANCE; }
 	
 	public static void setTolerance(double tol) {
 		ERR_TOLERANCE = tol;
@@ -49,16 +48,26 @@ public class SORSolver extends PoissonSolver {
 		do {
 			tester.initCycle(n);
 			// note: don't update end-points since they are fixed bdry conds
-			int j; // work from right-to-left simultaneously
-			for(int i = 1; i < n/2; ++i) {
-				tester.updateValAtIdx(stencil(i, soln), i);
-				j = n-i-1;
-				tester.updateValAtIdx(stencil(j, soln), j);
-			}
+//			int j; // work from right-to-left simultaneously
+//			for(int i = 1; i < n/2; ++i) {
+//				double newval = stencil(i,soln);
+//				tester.updateValAtIdx(newval, i);
+//				j = n-i-1;
+//				soln[j] = newval;
+//				tester.updateValAtIdx(newval, j);
+//			}
+//			// if n is odd then we still need to update the middle point
+//			if ((n & 1) == 1) {
+//				j = n/2; // works b/c int division truncates and array indexing starts at 0
+//				tester.updateValAtIdx(stencil(j, soln), j);
+//			}
 			// if n is odd then we still need to update the middle point
-			if ((n & 1) == 1) {
-				j = n/2; // works b/c int division truncates and array indexing starts at 0
-				tester.updateValAtIdx(stencil(j, soln), j);
+//			if ((n & 1) == 1) {
+//				j = n/2; // works b/c int division truncates and array indexing starts at 0
+//				tester.updateValAtIdx(stencil(j, soln), j);
+//			}
+			for(int i = 1; i < n-1; ++i) {
+				tester.updateValAtIdx(stencil(i,soln), i);
 			}
 		} while(!tester.hasConverged());
 		
@@ -74,8 +83,7 @@ public class SORSolver extends PoissonSolver {
 	 */
 	private double stencil(int i, double[] vals) {
 		final double dx = potential.getDomain().getDx(), x = potential.getDomain().getValAtIndex(i), 
-				RHS = potential.evalAt(x)/params.getDielectric().evalAt(x);
-		//TODO: is this right? Fink & Mathews seems to confirm it is
+				RHS = potential.evalAt(x)/(params.getDielectric().evalAt(x));
 		vals[i] = (1-SORParam)*vals[i] + SORParam*(vals[i-1] + vals[i+1] + dx*dx*RHS)/2;
 		return vals[i];
 	}

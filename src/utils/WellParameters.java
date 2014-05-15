@@ -36,10 +36,10 @@ public class WellParameters {
 		this.domain = d;
 		this.numLayers = 3;
 		double[] dumWidths = { totWidth/5*2, totWidth/5, totWidth/5*2};//1 layer, width is the whole domain
-		double[] dumDielecs = {12.0, 10.0, 12.0};
+		double[] dumDielecs = {10.0, 10.0, 10.0};
 		this.widths = dumWidths;
 		this.dielecs = dumDielecs;
-		this.effMasses = dumDielecs.clone();
+		this.effMasses = new double[] {1.0, 1.0, 1.0};
 		errTol = Main.DEFAULT_TOLERANCE;
 		Lz = totWidth;
 		Lx = 1e8;
@@ -83,26 +83,26 @@ public class WellParameters {
 		errTol = Double.parseDouble( params.getProperty("tolerance") );
 	}
 	
-	public Function getDofZ(){
+	public Function getDofZ() {
 		return new LazyFunction(getProblemDomain()) {
 			@Override
 			public double evalAt(double x) {
-				return getLayer(x, this.domain) == 1 ?
-						dOfZ :
-						0;
+				return getLayer(x, this.domain) == 1 
+						? dOfZ
+						: 0;
 			}
 		};
 	}
 	
-	public double getLx(){
+	public double getLx() {
 		return Lx;
 	}
 	
-	public double getLy(){
+	public double getLy() {
 		return Ly;
 	}
 	
-	public double getLz(){
+	public double getLz() {
 		return Lz;
 	}
 	

@@ -26,18 +26,18 @@ public class MainTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		domain = new Domain(-250.0, 250.0, 1500);
+		domain = new Domain(-200.0, 200.0, 0.1);
 		bgPotential = new LazyFunction(domain) {
 			@Override
 			public double evalAt(double x) {
 				if (x > -50.0 && x < 50.0)
 					return 0;
-				else 
+				else
 					return 0.16;
 			};
 		};
 		params = WellParameters.genDummyParams(domain);
-		SORSolver.setTolerance(1E-7);
+		SORSolver.setTolerance(5E-6);
 	}
 
 	@Test
@@ -47,16 +47,31 @@ public class MainTest {
 		Function totalPotential;
 		ConvergenceTester convTester = new ConvergenceTester(params.getErrTolerance());
 		Function rho;
+		Function randfcn = null;
 		int iters = 0;
+		
+		String outfile = "MainOutputs.m";
+		new File("tests/"+outfile).delete();
+		double[] domainArr = new double[domain.getNumPoints()];
+		for(int i = 0; i < domainArr.length; i++)
+			domainArr[i] = i * domain.getDx();
+		Function domainFunc = new GreedyFunction(domain, domainArr);
+		SORTest.printMatlab(domainFunc, "x = ", outfile);
+		
 		do {
 			// solve schrodingers eqn
 			totalPotential = electronPotential.add(bgPotential);
+			SORTest.printMatlab(totalPotential, "totalPot"+iters+" =", outfile);
 			SchrodingerSolver sSolver = new FiniteDifferenceSolver(params, totalPotential);
-			psis = sSolver.solveSystem(35); // TODO: decide how many states to find
+			psis = sSolver.solveSystem(40); // TODO: decide how many states to find
+			
+			for(int i = 0; i < 3; i++)
+				SORTest.printMatlab(psis[i], "psi" + i + " = ", outfile);
 			// get areal chg density
 			//TODO: take into account N_i
 			double[] nPerE = fillEnergies(sSolver.getEigenvalues());
 			rho = genRho(psis, nPerE);
+			SORTest.printMatlab(rho, "rho"+iters+" =", outfile);
 			// update eigenvals to test for convergence
 			convTester.updateCurValues(sSolver.getEigenvalues());
 			// solve poissons eqn
@@ -71,52 +86,47 @@ public class MainTest {
 //								0;
 //					};
 //				};
-				electronPotential = Function.getRandFcn(domain, (curv*L2-params.getDofZ().evalAt(0))*L2);
+				randfcn = Function.getRandFcn(domain, (curv*L2-params.getDofZ().evalAt(0))*L2);
+				electronPotential = randfcn;
 				SORTest.printMatlab(electronPotential, "initGuess =", "initGuessOut.m");
 //				electronPotential.offset();
 			}
 			PoissonSolver pSolver = new SORSolver(params, rho, electronPotential.negate());
 			// implicitly scaled by electron charge, which is 1
 			electronPotential = pSolver.solve().negate();
+			SORTest.printMatlab(electronPotential, "elecPot"+iters+" = ", outfile);
 			iters++;
 			System.out.println("Iter = " + iters);
 			System.out.println("EigVals = " + Arrays.toString(sSolver.getEigenvalues()));
+			
 		} while (!convTester.hasConverged() && iters < 30);
 		System.out.println( (iters<30) ? "Solution Converged" : "Solution failed to converge in 30 iterations");
-		
-		double[] domainArr = new double[domain.getNumPoints()];
-		for(int i = 0; i < domainArr.length; i++)
-			domainArr[i] = i * domain.getDx();
-		Function domainFunc = new GreedyFunction(domain, domainArr);
-		String outfile = "MainOutputs.m";
-		new File("tests/"+outfile).delete();
-		SORTest.printMatlab(domainFunc, "x = ", outfile);
-		SORTest.printMatlab(electronPotential, "elecPot = ", outfile);
-		SORTest.printMatlab(totalPotential, "totalPot =", outfile);
-		SORTest.printMatlab(rho, "rho =", outfile);
-		for(int i = 0; i < 3; i++)
-			SORTest.printMatlab(psis[i], "psi" + i + " = ", outfile);
-		
 	}
 	
 	//convenience for testing - will have to fix this for the real version
-	public double[] fillEnergies(double[] energies){
+	public double[] fillEnergies(double[] energies) {
 		double[] nPerE = new double[energies.length];
-		nPerE[0] = (params.getDofZ().evalAt(0) * params.getLz()/5)/2;
-		nPerE[1] = (params.getDofZ().evalAt(0) * params.getLz()/5)/2;
+		nPerE[0] = (params.getDofZ().evalAt(0) * params.getLz()/5);
+//		nPerE[0] = (params.getDofZ().evalAt(0) * params.getLz()/5)/2;
+//		nPerE[1] = (params.getDofZ().evalAt(0) * params.getLz()/5)/2;
 		return nPerE;
 	}
 	
 	//gives the charge density within the sample, scaled by the dielectric constant for Poisson's equation
-	public Function genRho(Function[] psis, double[] nPerE){
+	public Function genRho(Function[] psis, double[] nPerE) {
 		double[] rhoVals = new double[domain.getNumPoints()];
 		Function psiSum = Function.getZeroFcn(domain);
-		for (int i = 0; i < psis.length; i++){
-			Function temp = psis[i].square().scale(nPerE[i]);
-			psiSum = psiSum.add(temp);
+		for (int i = 0; i < psis.length; i++) {
+			if(nPerE[i] > 1E-12) {
+				Function temp = psis[i].square().scale(nPerE[i]);
+				psiSum = psiSum.add(temp);
+			}
 		}
-		for (int i = 0; i < rhoVals.length; i++){
-			rhoVals[i] = params.getDofZ().evalAtIdx(i) - psiSum.evalAtIdx(i);
+		for (int i = 0; i < rhoVals.length; i++) {
+			double newval = params.getDofZ().evalAtIdx(i) - psiSum.evalAtIdx(i); 
+			rhoVals[i] = Math.abs(newval) > 1E-13
+					? newval
+					: 0.0;
 		}
 		return new GreedyFunction(domain, rhoVals);
 	}
