@@ -26,7 +26,7 @@ public class MainTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		domain = new Domain(-250.0, 250.0, 3000);
+		domain = new Domain(-250.0, 250.0, 1000);
 		bgPotential = new LazyFunction(domain) {
 			@Override
 			public double evalAt(double x) {
@@ -52,7 +52,7 @@ public class MainTest {
 			// solve schrodingers eqn
 			totalPotential = electronPotential.add(bgPotential);
 			SchrodingerSolver sSolver = new FiniteDifferenceSolver(params, totalPotential);
-			psis = sSolver.solveSystem(30); // TODO: decide how many states to find
+			psis = sSolver.solveSystem(15); // TODO: decide how many states to find
 			// get areal chg density
 			//TODO: take into account N_i
 			double[] nPerE = fillEnergies(sSolver.getEigenvalues());
@@ -115,7 +115,6 @@ public class MainTest {
 			Function temp = psis[i].square().scale(nPerE[i]);
 			psiSum = psiSum.add(temp);
 		}
-//		psiSum = psiSum.scale(1/(params.getLx()*params.getLy()));//scale psi to correspond to a volume density
 		for (int i = 0; i < rhoVals.length; i++){
 			rhoVals[i] = params.getDofZ().evalAtIdx(i) - psiSum.evalAtIdx(i);
 		}
