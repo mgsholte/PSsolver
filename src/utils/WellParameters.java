@@ -51,9 +51,9 @@ public class WellParameters {
 		//TODO: for testing only
 		double totWidth = d.getUB() - d.getLB();
 		this.domain = d;
-		this.numLayers = 1;
-		double[] dumWidths = {d.getUB() - d.getLB()}; //1 layer, width is the whole domain
-		double[] dumDielecs = {1.0}; //use epsilon = 1 for testing
+		this.numLayers = 3;
+		double[] dumWidths = { totWidth/5*2, totWidth/5, totWidth/5*2};//1 layer, width is the whole domain
+		double[] dumDielecs = {10.0, 10.0, 10.0};
 		this.widths = dumWidths;
 		this.dielecs = dumDielecs;
 		this.effMasses = new double[] {1.0, 1.0, 1.0};
@@ -123,7 +123,7 @@ public class WellParameters {
 		return Lz;
 	}
 	
-	public double getTolerance() {
+	public double getErrTolerance() {
 		return errTol;
 	}
 	

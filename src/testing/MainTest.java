@@ -45,7 +45,7 @@ public class MainTest {
 		// approximation to electron contribution to potential. starts as zero fcn
 		Function electronPotential = Function.getZeroFcn(domain);
 		Function totalPotential;
-		ConvergenceTester convTester = new ConvergenceTester(params.getTolerance());
+		ConvergenceTester convTester = new ConvergenceTester(params.getErrTolerance());
 		Function rho;
 		Function randfcn = null;
 		int iters = 0;

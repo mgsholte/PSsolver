@@ -52,7 +52,7 @@ public final class Main {
 		// approximation to electron contribution to potential. starts as zero fcn
 		Function electronPotential = Function.getZeroFcn(domain);
 		Function totalPotential;
-		ConvergenceTester convTester = new ConvergenceTester(params.getTolerance());
+		ConvergenceTester convTester = new ConvergenceTester(params.getErrTolerance());
 		do {
 			// solve schrodingers eqn
 			totalPotential = electronPotential.add(params.getBgPotential());

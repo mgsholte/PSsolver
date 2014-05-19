@@ -19,7 +19,7 @@ public class WellParametersTest {
 	public void test() {
 		try {
 			WellParameters params = new WellParameters("well_params_test.kvp");
-			assertEquals(1e-6, params.getTolerance(), 0.00001);
+			assertEquals(1e-6, params.getErrTolerance(), 0.00001);
 		} catch (ParameterReadException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
