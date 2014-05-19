@@ -1,5 +1,7 @@
 package utils;
 
+import java.util.Random;
+
 public abstract class Function {
 	
 	public static final Function getZeroFcn(Domain domain) {
@@ -7,6 +9,16 @@ public abstract class Function {
 			@Override
 			public double evalAt(double x) {
 				return 0;
+			}
+		};
+	}
+	
+	public static final Function getRandFcn(Domain domain, final double scale) {
+		return new LazyFunction(domain) {
+			Random rng = new Random();
+			@Override
+			public double evalAt(double x) {
+				return (rng.nextDouble()-0.5)*2*scale;
 			}
 		};
 	}
@@ -49,6 +61,8 @@ public abstract class Function {
 	
 	abstract public Function scale(double factor);
 	
+	abstract public Function negate();
+	
 	abstract public Function add(Function f) throws DomainMismatchException;
 	
 	abstract public Function square();
@@ -74,5 +88,31 @@ public abstract class Function {
 	}
 
 	abstract public Function offset();
+	
+	public Function divide(Function f){
+		double[] vals = new double[domain.getNumPoints()];
+		for(int i = 0; i < vals.length; i++){
+			vals[i] = this.evalAtIdx(i)/f.evalAtIdx(i);
+		}
+		return new GreedyFunction(domain, vals);
+	}
+	
+	public Function multiply(Function f){
+		double[] vals = new double[domain.getNumPoints()];
+		for(int i = 0; i < vals.length; i++){
+			vals[i] = this.evalAtIdx(i)*f.evalAtIdx(i);
+		}
+		return new GreedyFunction(domain, vals);
+	}
+	
+	public double integrate(double lb, double ub){
+		if (!domain.contains(lb) || !domain.contains(ub))
+			throw new IllegalArgumentException("Cannot integrate on the given interval - bound(s) outside domain");
+		double result = 0;
+		for(int i = domain.getIndexOf(lb); i < domain.getIndexOf(ub); i++)
+			result += evalAtIdx(i) * domain.getDx();
+		return result;
+	}
+
 
 }

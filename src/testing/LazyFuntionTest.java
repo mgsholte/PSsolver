@@ -94,6 +94,18 @@ public class LazyFuntionTest {
 		}
 	}
 	
+	@Test
+	public void testIntegrate(){
+		Domain d = new Domain(0, 100, .000001);
+		Function f = new LazyFunction(d){
+			@Override
+			public double evalAt(double x){
+				return x;
+			}
+		};
+		assertEquals(f.integrate(d.getLB(), d.getUB()), 5000, .0001);
+	}
+	
 
 	
 

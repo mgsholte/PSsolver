@@ -2,24 +2,26 @@ package utils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Properties;
 
 import main.Main;
 
 public class WellParameters {
 	
-	public static final String defaultParamsFileName = "./well_params_default.kvp";
+	public static final String defaultParamsFileName = "well_params_default.kvp";
 
 	private Properties params;
 
 	public int numLayers;
 	
 	private double
-		dx, errTol;
+		dx, errTol, Lx, Ly, Lz, dOfZ;//dOfZ in A^-3 ~ 2e-6
 	
 	private double[]
-		widths, bandGaps, dielecs, effMasses;
+		widths, bandGaps, dielecs, effMasses;//effMasses need to be relative to rest mass
 	
 	private Domain domain;
 	
@@ -27,18 +29,39 @@ public class WellParameters {
 		return new WellParameters(d);
 	}
 	
+	public static final void regenDefaults() {
+		Properties defParams = new Properties();
+		defParams.setProperty("tolerance", "1e-6");
+		defParams.setProperty("dx", ".1");
+		try {
+			OutputStream defaultFile = new FileOutputStream(defaultParamsFileName);
+			defParams.store(defaultFile, "The auto-generated default parameters file");
+			defaultFile.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Unable to write default params to file: "+defaultParamsFileName);
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * For creating fake param objects for easier testing
 	 */
 	private WellParameters(Domain d) {
 		//TODO: for testing only
+		double totWidth = d.getUB() - d.getLB();
 		this.domain = d;
 		this.numLayers = 1;
-		double[] dumWidths = {d.getUB() - d.getLB()};//1 layer, width is the whole domain
-		double[] dumDielecs = {1.0};//use epsilon = 1 for testing
+		double[] dumWidths = {d.getUB() - d.getLB()}; //1 layer, width is the whole domain
+		double[] dumDielecs = {1.0}; //use epsilon = 1 for testing
 		this.widths = dumWidths;
 		this.dielecs = dumDielecs;
+		this.effMasses = new double[] {1.0, 1.0, 1.0};
 		errTol = Main.DEFAULT_TOLERANCE;
+		Lz = totWidth;
+		Lx = 1e8;
+		Ly = 1e8;
+		dOfZ = 2e-6;
 	}
 	
 	public WellParameters(String paramsFileName) throws ParameterReadException {
@@ -68,7 +91,7 @@ public class WellParameters {
 			in = new FileInputStream(paramsFileName);
 			params.load(in);
 		} catch (FileNotFoundException e) {
-			System.err.println("Error: input well parameters file not found.");
+			throw new ParameterReadException("Error: input well parameters file not found.");
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new ParameterReadException("Execption occurred while reading the input well parameters file", e);
@@ -77,8 +100,35 @@ public class WellParameters {
 		errTol = Double.parseDouble( params.getProperty("tolerance") );
 	}
 	
-	public double getErrTolerance() {
+	public Function getDofZ() {
+		return new LazyFunction(getProblemDomain()) {
+			@Override
+			public double evalAt(double x) {
+				return getLayer(x, this.domain) == 1 
+						? dOfZ
+						: 0;
+			}
+		};
+	}
+	
+	public double getLx() {
+		return Lx;
+	}
+	
+	public double getLy() {
+		return Ly;
+	}
+	
+	public double getLz() {
+		return Lz;
+	}
+	
+	public double getTolerance() {
 		return errTol;
+	}
+	
+	public double[] getWidths() {
+		return widths;
 	}
 
 	public Domain getProblemDomain() {
@@ -108,12 +158,12 @@ public class WellParameters {
 		// find which layer x is in.
 		// as long as x is to the right, move to the next layer edge
 		int layer = 0;
-		while (x > rightEdge) {
+		while (x > rightEdge || rightEdge == domain.getLB()) {
 			if (layer >= numLayers)
 				throw new IllegalArgumentException("x is not in the mass fcn domain");
 			rightEdge += widths[layer++];
 		}
-		return layer;
+		return layer - 1;
 	}
 	
 	public Function getMass() {
@@ -127,16 +177,23 @@ public class WellParameters {
 	
 	public Function getDielectric() {
 		return new LazyFunction(getProblemDomain()) {
+			private static final double eps0 = 0.00552635;
 			@Override
 			public double evalAt(double x) {
-				return dielecs[getLayer(x, domain) - 1];//I changed this because it gave an ArrayIndexOutOfBounds with a 1-layer domain
+				return dielecs[getLayer(x, domain)]*eps0;
 			}
 		};
 	}
 
 	public Function getBgPotential() {
-		// TODO Auto-generated method stub
-		return null;
+		final double[] bGPVals = bandGaps.clone();
+		LazyFunction bGPTemp = new LazyFunction(domain){
+			@Override
+			public double evalAt(double x){
+				return bGPVals[getLayer(x, domain)];
+			};
+		};
+		return bGPTemp.offset();
 	}
 	
 }
