@@ -4,21 +4,11 @@ import utils.Function;
 import utils.WellParameters;
 
 abstract public class PoissonSolver extends ODESolver {
-<<<<<<< HEAD
-	
-	protected final static double VAC_PERM = .00553; //This is vacuum permittivity in units of (electron charge)/(Volt * Angstrom)
-			
-=======
 
-	protected static final double eps0 = 1.0; // true val = 0.00552
-	
->>>>>>> refs/remotes/origin/master
+	protected static final double eps0 = 0.00552; // true val = 0.00552
+
 	public PoissonSolver(WellParameters params, Function chgDensity) {
-<<<<<<< HEAD
-		super(params, chgDensity.scale(4 * Math.PI));//.scale(1/VAC_PERM));
-=======
-		super(params, chgDensity.scale(1.0/eps0));
->>>>>>> refs/remotes/origin/master
+		super(params, chgDensity);
 	}
 
 	/**

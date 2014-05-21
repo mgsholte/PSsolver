@@ -7,14 +7,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import solvers.FiniteDifferenceSolver;
+import solvers.MultigridSolver;
 import solvers.PoissonSolver;
-import solvers.SORSolver;
 import solvers.SchrodingerSolver;
 import utils.ConvergenceTester;
 import utils.Domain;
 import utils.Function;
-import utils.LazyFunction;
 import utils.GreedyFunction;
+import utils.LazyFunction;
 import utils.WellParameters;
 
 public class MainTest {
@@ -26,7 +26,7 @@ public class MainTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		domain = new Domain(-250.0, 250.0, 4097);
+		domain = new Domain(-200.0, 200.0, 4093);
 		bgPotential = new LazyFunction(domain) {
 			@Override
 			public double evalAt(double x) {
@@ -37,7 +37,7 @@ public class MainTest {
 			};
 		};
 		params = WellParameters.genDummyParams(domain);
-		SORSolver.setTolerance(5E-6);
+		MultigridSolver.setTolerance(1E-7);
 	}
 
 	@Test
@@ -63,13 +63,7 @@ public class MainTest {
 			totalPotential = electronPotential.add(bgPotential);
 			SORTest.printMatlab(totalPotential, "totalPot"+iters+" =", outfile);
 			SchrodingerSolver sSolver = new FiniteDifferenceSolver(params, totalPotential);
-			System.out.println("Iter = " + iters);
-			System.out.println("EigVals = " + Arrays.toString(sSolver.getEigenvalues()));
-			System.out.println("Finding new potential...");
-			psis = sSolver.solveSystem(35); // TODO: decide how many states to find
-			
-			for(int i = 0; i < 3; i++)
-				SORTest.printMatlab(psis[i], "psi" + i + " = ", outfile);
+			psis = sSolver.solveSystem(50); // TODO: decide how many states to find
 			// get areal chg density
 			//TODO: take into account N_i
 			double[] nPerE = fillEnergies(sSolver.getEigenvalues());
@@ -97,20 +91,24 @@ public class MainTest {
 				SORTest.printMatlab(electronPotential, "initGuess =", "initGuessOut.m");
 //				electronPotential.offset();
 			}
-			PoissonSolver pSolver = new SORSolver(params, rho, electronPotential.negate());
+//			PoissonSolver pSolver = new SORSolver(params, rho, electronPotential.negate());
+			PoissonSolver pSolver = new MultigridSolver(params, rho);
 			// implicitly scaled by electron charge, which is 1
+			System.out.println("Finding new potential...");
 			electronPotential = pSolver.solve().negate();
 			SORTest.printMatlab(electronPotential, "elecPot"+iters+" = ", outfile);
 			iters++;
 			
-			SORTest.printMatlab(electronPotential, "elecPot = ", outfile);
-			SORTest.printMatlab(totalPotential, "totalPot =", outfile);
-			SORTest.printMatlab(rho, "rho =", outfile);
+			System.out.println("Iter = " + iters);
+			System.out.println("EigVals = " + Arrays.toString(sSolver.getEigenvalues()));
 			for(int i = 0; i < 3; i++)
 				SORTest.printMatlab(psis[i], "psi" + i + " = ", outfile);
 
 		} while (!convTester.hasConverged() && iters < 30);
 		System.out.println( (iters<30) ? "Solution Converged" : "Solution failed to converge in 30 iterations");
+		
+		for(int i = 0; i < 3; i++)
+			SORTest.printMatlab(psis[i], "psi" + i + " = ", outfile);
 	}
 	
 	//convenience for testing - will have to fix this for the real version

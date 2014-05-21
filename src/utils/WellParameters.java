@@ -53,19 +53,10 @@ public class WellParameters {
 		this.domain = d;
 		this.numLayers = 3;
 		double[] dumWidths = { totWidth/5*2, totWidth/5, totWidth/5*2};//1 layer, width is the whole domain
-<<<<<<< HEAD
-		double[] dumDielecs = {12.0, 10.0, 12.0};
-		double[] dumMasses = {1, 1, 1};
-=======
 		double[] dumDielecs = {10.0, 10.0, 10.0};
->>>>>>> refs/remotes/origin/master
 		this.widths = dumWidths;
 		this.dielecs = dumDielecs;
-<<<<<<< HEAD
-		this.effMasses = dumMasses;
-=======
 		this.effMasses = new double[] {1.0, 1.0, 1.0};
->>>>>>> refs/remotes/origin/master
 		errTol = Main.DEFAULT_TOLERANCE;
 		Lz = totWidth;
 		Lx = 1e8;
@@ -175,23 +166,31 @@ public class WellParameters {
 		return layer - 1;
 	}
 	
+	Function massFcn;
 	public Function getMass() {
-		return new LazyFunction(getProblemDomain()) {
-			@Override
-			public double evalAt(double x) {
-				return effMasses[getLayer(x, domain)];
-			}
-		};
+		if (massFcn == null) {
+			massFcn = new LazyFunction(getProblemDomain()) {
+				@Override
+				public double evalAt(double x) {
+					return effMasses[getLayer(x, domain)];
+				}
+			};
+		}
+		return massFcn;
 	}
 	
+	Function dielecFcn;
 	public Function getDielectric() {
-		return new LazyFunction(getProblemDomain()) {
-			private static final double eps0 = 0.00552635;
-			@Override
-			public double evalAt(double x) {
-				return dielecs[getLayer(x, domain)]*eps0;
-			}
-		};
+		if (dielecFcn == null) {
+			dielecFcn = new LazyFunction(getProblemDomain()) {
+				private static final double eps0 = 0.00552635;
+				@Override
+				public double evalAt(double x) {
+					return dielecs[getLayer(x, domain)]*eps0;
+				}
+			}; 
+		}
+		return  dielecFcn;
 	}
 
 	public Function getBgPotential() {

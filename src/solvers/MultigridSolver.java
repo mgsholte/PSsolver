@@ -16,7 +16,7 @@ public class MultigridSolver extends PoissonSolver {
 	protected static double ERR_TOLERANCE = 1E-7;
 	protected int fineNumPoints;
 
-	
+	private final Function RHS;
 	
 	//Used to find the number of grids to use
 	public static int log2( int bits ) // returns 0 for bits=0
@@ -32,6 +32,7 @@ public class MultigridSolver extends PoissonSolver {
 	public MultigridSolver(WellParameters params, Function chgDensity) {
 		super(params, chgDensity);
 		fineNumPoints = potential.getDomain().getNumPoints();
+		RHS = potential.divide(params.getDielectric());
 	}
 	
 	public static void setTolerance(double tol) {
@@ -50,7 +51,7 @@ public class MultigridSolver extends PoissonSolver {
 		double[] residual = new double[n + 1];
 		do{
 			int iter = 0;//number of g-s iterations
-			long startTime = System.currentTimeMillis();
+//			long startTime = System.currentTimeMillis();
 			do{
 				iter++;
 				soln = gaussSeidel(h, soln);
@@ -58,7 +59,7 @@ public class MultigridSolver extends PoissonSolver {
 			residual = error(soln, h);
 			r = maxErr(residual);
 
-			System.out.println("The g-s residual is " + r + ", the grid size is " + (n + 1) + " points.");
+//			System.out.println("The g-s residual is " + r + ", the grid size is " + (n + 1) + " points.");
 			
 			//if g-s did not converge, restrict to a coarser grid
 			if(r >= ERR_TOLERANCE){
@@ -66,7 +67,7 @@ public class MultigridSolver extends PoissonSolver {
 			}
 			
 			//if g-s did converge, interpolate to a finer grid
-			else if(r < ERR_TOLERANCE && h >= potential.getDomain().getDx() * 2){
+			else if(r < ERR_TOLERANCE && h >= potential.getDomain().getDx() * 2) {
 				soln = interpolate(soln, h, n);
 				h /= 2;
 				n *= 2;
@@ -87,10 +88,13 @@ public class MultigridSolver extends PoissonSolver {
 		double lb = potential.getDomain().getLB();
 		double h2 = gridSpacing * gridSpacing;
 		int j;
+		double xl, xr;
 		for(int i = 1; i < uNewLeft.length - 1; i++){
 			j = uNewRight.length - 1 - i;
-			uNewLeft[i] = h2 / 2.0 * (potential.evalAt(lb + i * gridSpacing) + uNewLeft[i - 1]/h2 + u[i + 1]/h2);
-			uNewRight[j] = h2 / 2.0 * (potential.evalAt(lb + j * gridSpacing) + uNewRight[j + 1]/h2 + u[j - 1]/h2);
+			xl = lb + i*gridSpacing;
+			xr = lb + j*gridSpacing;
+			uNewLeft[i] = h2 / 2.0 * (RHS.evalAt(xl) + uNewLeft[i - 1]/h2 + u[i + 1]/h2);
+			uNewRight[j] = h2 / 2.0 * (RHS.evalAt(xr) + uNewRight[j + 1]/h2 + u[j - 1]/h2);
 		}
 		double[] uNew = new double[u.length];
 		for(int i = 0; i < uNew.length; i++)
@@ -120,8 +124,11 @@ public class MultigridSolver extends PoissonSolver {
 		double[] residual = new double[u.length];
 		double lb = potential.getDomain().getLB();
 		double h2 = h * h;
-		for(int i = 1; i < residual.length - 1; i++)
-			residual[i] = potential.evalAt(lb + i * h) + 1/h2 * (u[i - 1] + u[i + 1] - 2 * u[i]);
+		double x;
+		for(int i = 1; i < residual.length - 1; i++) {
+			x = lb + i * h;
+			residual[i] = RHS.evalAt(x) + 1/h2 * (u[i - 1] + u[i + 1] - 2 * u[i]);
+		}
 		return residual;
 	}
 	

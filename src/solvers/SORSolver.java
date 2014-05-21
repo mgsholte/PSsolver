@@ -50,16 +50,6 @@ public class SORSolver extends PoissonSolver {
 		do {
 			tester.initCycle(n);
 			// note: don't update end-points since they are fixed bdry conds
-<<<<<<< HEAD
-			int j; // work from right-to-left simultaneously
-			for(int i = 1; i < n/2; ++i) {
-				tester.updateValAtIdx(stencil(i, soln), i);
-				j = n-i-1;
-				soln[j] = soln[i];
-				//test to see if we can settle with just solving half of a symmetric problem
-				tester.updateValAtIdx(soln[j], j);//tester.updateValAtIdx(stencil(j, soln), j);
-			}
-=======
 //			int j; // work from right-to-left simultaneously
 //			for(int i = 1; i < n/2; ++i) {
 //				double newval = stencil(i,soln);
@@ -73,7 +63,6 @@ public class SORSolver extends PoissonSolver {
 //				j = n/2; // works b/c int division truncates and array indexing starts at 0
 //				tester.updateValAtIdx(stencil(j, soln), j);
 //			}
->>>>>>> refs/remotes/origin/master
 			// if n is odd then we still need to update the middle point
 //			if ((n & 1) == 1) {
 //				j = n/2; // works b/c int division truncates and array indexing starts at 0
