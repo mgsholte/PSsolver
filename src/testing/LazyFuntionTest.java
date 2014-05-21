@@ -106,7 +106,4 @@ public class LazyFuntionTest {
 		assertEquals(f.integrate(d.getLB(), d.getUB()), 5000, .0001);
 	}
 	
-
-	
-
 }

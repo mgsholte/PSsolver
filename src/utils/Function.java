@@ -18,7 +18,7 @@ public abstract class Function {
 			Random rng = new Random();
 			@Override
 			public double evalAt(double x) {
-				return rng.nextDouble()*scale;
+				return (rng.nextDouble()-0.5)*2*scale;
 			}
 		};
 	}

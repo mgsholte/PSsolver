@@ -2,14 +2,16 @@ package utils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Properties;
 
 import main.Main;
 
 public class WellParameters {
 	
-	public static final String defaultParamsFileName = "./well_params_default.kvp";
+	public static final String defaultParamsFileName = "well_params_default.kvp";
 
 	private Properties params;
 
@@ -27,6 +29,21 @@ public class WellParameters {
 		return new WellParameters(d);
 	}
 	
+	public static final void regenDefaults() {
+		Properties defParams = new Properties();
+		defParams.setProperty("tolerance", "1e-6");
+		defParams.setProperty("dx", ".1");
+		try {
+			OutputStream defaultFile = new FileOutputStream(defaultParamsFileName);
+			defParams.store(defaultFile, "The auto-generated default parameters file");
+			defaultFile.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Unable to write default params to file: "+defaultParamsFileName);
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * For creating fake param objects for easier testing
 	 */
@@ -36,11 +53,19 @@ public class WellParameters {
 		this.domain = d;
 		this.numLayers = 3;
 		double[] dumWidths = { totWidth/5*2, totWidth/5, totWidth/5*2};//1 layer, width is the whole domain
+<<<<<<< HEAD
 		double[] dumDielecs = {12.0, 10.0, 12.0};
 		double[] dumMasses = {1, 1, 1};
+=======
+		double[] dumDielecs = {10.0, 10.0, 10.0};
+>>>>>>> refs/remotes/origin/master
 		this.widths = dumWidths;
 		this.dielecs = dumDielecs;
+<<<<<<< HEAD
 		this.effMasses = dumMasses;
+=======
+		this.effMasses = new double[] {1.0, 1.0, 1.0};
+>>>>>>> refs/remotes/origin/master
 		errTol = Main.DEFAULT_TOLERANCE;
 		Lz = totWidth;
 		Lx = 1e8;
@@ -75,7 +100,7 @@ public class WellParameters {
 			in = new FileInputStream(paramsFileName);
 			params.load(in);
 		} catch (FileNotFoundException e) {
-			System.err.println("Error: input well parameters file not found.");
+			throw new ParameterReadException("Error: input well parameters file not found.");
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new ParameterReadException("Execption occurred while reading the input well parameters file", e);
@@ -84,26 +109,26 @@ public class WellParameters {
 		errTol = Double.parseDouble( params.getProperty("tolerance") );
 	}
 	
-	public Function getDofZ(){
+	public Function getDofZ() {
 		return new LazyFunction(getProblemDomain()) {
 			@Override
 			public double evalAt(double x) {
-				return getLayer(x, this.domain) == 1 ?
-						dOfZ :
-						0;
+				return getLayer(x, this.domain) == 1 
+						? dOfZ
+						: 0;
 			}
 		};
 	}
 	
-	public double getLx(){
+	public double getLx() {
 		return Lx;
 	}
 	
-	public double getLy(){
+	public double getLy() {
 		return Ly;
 	}
 	
-	public double getLz(){
+	public double getLz() {
 		return Lz;
 	}
 	
