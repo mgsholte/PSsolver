@@ -13,11 +13,8 @@ import utils.WellParameters;
  */
 public class MultigridSolver extends PoissonSolver {
 	
-	protected static double ERR_TOLERANCE = 1E-7;
 	protected int fineNumPoints;
 
-	private final Function RHS;
-	
 	//Used to find the number of grids to use
 	public static int log2( int bits ) // returns 0 for bits=0
 	{
@@ -32,13 +29,8 @@ public class MultigridSolver extends PoissonSolver {
 	public MultigridSolver(WellParameters params, Function chgDensity) {
 		super(params, chgDensity);
 		fineNumPoints = potential.getDomain().getNumPoints();
-		RHS = potential.divide(params.getDielectric());
 	}
 	
-	public static void setTolerance(double tol) {
-		ERR_TOLERANCE = tol;
-	}
-
 	@Override
 	public Function solve(double param) {
 		final int numGrids = log2(fineNumPoints);

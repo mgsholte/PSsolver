@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import solvers.MultigridSolver;
+import solvers.PoissonSolver;
 import utils.Domain;
 import utils.Function;
 import utils.LazyFunction;
@@ -73,9 +74,9 @@ public class MultigridSolverTest {
 		new File(outdir + "well.m").delete();
 
 		// setup solvers
-		MultigridSolver solverT = new MultigridSolver(params, trivial);
-		MultigridSolver solverC = new MultigridSolver(params, constant);
-		MultigridSolver solverW = new MultigridSolver(params, well);
+		PoissonSolver solverT = new MultigridSolver(params, trivial);
+		PoissonSolver solverC = new MultigridSolver(params, constant);
+		PoissonSolver solverW = new MultigridSolver(params, well);
 
 		// find solutions and print to files for matlab import
 		System.out.println("finding trivial soln");

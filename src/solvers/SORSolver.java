@@ -7,15 +7,8 @@ import utils.WellParameters;
 
 public class SORSolver extends PoissonSolver {
 	
-	protected static double ERR_TOLERANCE = 1E-7;
 	protected Function initGuess;
 	
-	public static double getTolerance() { return ERR_TOLERANCE; }
-	
-	public static void setTolerance(double tol) {
-		ERR_TOLERANCE = tol;
-	}
-
 	/** parameter controlling the successive over-relaxation mixing */
 	private final double SORParam;
 
@@ -46,7 +39,7 @@ public class SORSolver extends PoissonSolver {
 		soln[0] = soln[n - 1] = 0;
 		ConvergenceTester tester = new ConvergenceTester(ERR_TOLERANCE);
 		final double dx = potential.getDomain().getDx();
-		double x, RHS, newval;
+		double x, newval;
 		do {
 			tester.initCycle(n);
 			// note: don't update end-points since they are fixed bdry conds
@@ -70,8 +63,7 @@ public class SORSolver extends PoissonSolver {
 //			}
 			for(int i = 1; i < n-1; ++i) {
 				x = potential.getDomain().getValAtIndex(i);
-				RHS = potential.evalAt(x)/(params.getDielectric().evalAt(x));
-				newval = (1-SORParam)*soln[i] + SORParam*(soln[i-1] + soln[i+1] + dx*dx*RHS)/2; 
+				newval = (1-SORParam)*soln[i] + SORParam*(soln[i-1] + soln[i+1] + dx*dx*RHS.evalAt(x))/2; 
 				soln[i] = newval;
 				tester.updateValAtIdx(newval, i);
 //				tester.updateValAtIdx(stencil(i,soln), i);
@@ -88,10 +80,11 @@ public class SORSolver extends PoissonSolver {
 	 * @param vals - the array which is being iteratively updated
 	 * @return the updated value
 	 */
+	@Deprecated
 	private double stencil(int i, double[] vals) {
-		final double dx = potential.getDomain().getDx(), x = potential.getDomain().getValAtIndex(i), 
-				RHS = potential.evalAt(x)/(params.getDielectric().evalAt(x));
-		vals[i] = (1-SORParam)*vals[i] + SORParam*(vals[i-1] + vals[i+1] + dx*dx*RHS)/2;
+		final double dx = potential.getDomain().getDx(), 
+				x = potential.getDomain().getValAtIndex(i);
+		vals[i] = (1-SORParam)*vals[i] + SORParam*(vals[i-1] + vals[i+1] + dx*dx*RHS.evalAt(x))/2;
 		return vals[i];
 	}
 
