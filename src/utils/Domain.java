@@ -1,13 +1,13 @@
 package utils;
 
-import main.Main;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import main.Main;
+
 /**
- * Domains are contiguous subsets of the real numbers
+ * Domains are closed subintervals of the real numbers
  * @author Mark
  *
  */
@@ -17,7 +17,7 @@ public class Domain implements Iterable<Double> {
 	 * Tolerance for determining if a number is close enough to be 
 	 * a number in the domain to be considered in the domain. Default
 	 * controlled by {@link Main#DEFAULT_TOLERANCE} */
-	private static double TOLERANCE = Main.DEFAULT_TOLERANCE;
+	private static double TOLERANCE = 1E-10;
 	
 	public static final double getTolerance() {
 		return TOLERANCE;
@@ -33,12 +33,10 @@ public class Domain implements Iterable<Double> {
 	/** the lower and upper bounds of the domain */
 	private final double lb, ub;
 	/** the uniform spacing between points in the domain */
-	private final double dx;
+	protected double dx;
 	/** the number of points in the domain */
-	private final int N;
+	protected final int N;
 	
-	//TODO: Can we change this so that it always sets the upper bound to be the higher x value?
-	//yes, with Math.min and max. Is this useful?
 	/**
 	 * Construct a domain object with the given bounds and specified number of points.
 	 * Due to floating point precision, the upper bound may be modified slightly so that
@@ -50,9 +48,9 @@ public class Domain implements Iterable<Double> {
 	 */
 	public Domain(double lb, double ub, int N) {
 		N = (N < 2) ? 2 : N;
-		this.lb = lb; 
-		this.dx = (ub-lb)/(N-1); 
-		this.ub = lb + dx*(N-1);
+		this.lb = lb;
+		this.ub = ub;
+		setDX(N);
 		this.N = N;
 	}
 	
@@ -76,6 +74,17 @@ public class Domain implements Iterable<Double> {
 		this.ub = lb + dx*(N-1);
 	}
 
+	/**
+	 * set {@code dx} to the value it should be for this domain for the given number of points
+	 * @param N - the number of points for which to calculate {@code dx}
+	 * @throws an AssertionError if the {@code ub} implied by the calculated {@code dx} is more than
+	 * 		5 ulps off from the actual {@code ub}
+	 */
+	protected void setDX(int N) {
+		dx = (ub-lb)/(N-1);
+		org.junit.Assert.assertEquals(lb + dx*(N-1), ub, 5*Math.ulp(ub));
+	}
+	
 	public double getLB() { return lb; }
 	public double getUB() { return ub; }
 	public double getDx() { return dx; }
@@ -145,7 +154,7 @@ public class Domain implements Iterable<Double> {
 	}
 	
 	/**
-	 * Note: Note: does not test if {@code x} is aligned on a multiple of {@code dx} from {@code lb}
+	 * Note: does not test if {@code x} is aligned on a multiple of {@code dx} from {@code lb}
 	 * @param x - the value whose index is desired
 	 * @return the number of multiples of {@code dx} by which {@code x} is greater than {@code lb}
 	 */
@@ -166,25 +175,29 @@ public class Domain implements Iterable<Double> {
 
 	@Override
 	public Iterator<Double> iterator() {
-		return new DomainIterator();
+		return new DomainIterator(dx);
 	}
 	
 	private class DomainIterator implements Iterator<Double> {
-		double curPosition; 
+		private final double curDX, fudge_factor;
 		
-		public DomainIterator() {
+		double curPosition;
+		
+		public DomainIterator(double dx) {
+			this.curDX = dx; // allow for dx to change mid iteration
+			fudge_factor = 5*Math.ulp(ub); // allow some room for spill-over past ub due to floating point arithmetic
 			curPosition = lb;
 		}
 
 		@Override
 		public boolean hasNext() {
-			return curPosition <= ub + dx/8.0;
+			return curPosition <= ub + fudge_factor; 
 		}
 
 		@Override
 		public Double next() {
 			double ans = curPosition;
-			curPosition += dx;
+			curPosition += curDX;
 			return ans;
 		}
 
